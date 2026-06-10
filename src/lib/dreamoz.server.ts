@@ -10,7 +10,7 @@ export async function getToken(): Promise<string> {
   const res = await fetch(`${API_BASE}/Client/Token`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ key: KEY, secret: SECRET }),
+    body: JSON.stringify({ APIKey: KEY, APISecret: SECRET }),
   });
   if (!res.ok) throw new Error(`Token fetch failed: ${res.status}`);
   const json: any = await res.json();
