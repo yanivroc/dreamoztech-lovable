@@ -15,6 +15,7 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Member profile, products and posts." },
     ],
   }),
+  ssr: false,
   loader: ({ context }) => context.queryClient.ensureQueryData(dataQuery),
   component: Index,
   errorComponent: ({ error }) => (
