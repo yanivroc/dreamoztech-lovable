@@ -194,24 +194,44 @@ function ItemCard({ item }: { item: any }) {
 }
 
 function PostRow({ item }: { item: any }) {
-  const img = resolveImg(item.image ?? item.picture ?? item.thumbnail);
-  const title = item.title ?? item.name ?? "Untitled";
+  const pic = Array.isArray(item.pics) && item.pics.length > 0
+    ? [...item.pics].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))[0]
+    : null;
+  const img = resolveImg(pic?.picThumbPath ?? pic?.picPath ?? item.image);
+  const title = item.bizName ?? item.title ?? "Untitled";
+  const desc = item.bizDesc ?? item.description;
+  const date = item.createDateTime ? new Date(item.createDateTime).toLocaleDateString() : null;
+  const categories: any[] = Array.isArray(item.categories) ? item.categories : [];
+
   return (
     <article className="flex gap-4 rounded-lg border bg-card p-4 shadow-sm">
       {img && (
         <img
           src={img}
           alt={title}
-          className="h-20 w-20 shrink-0 rounded object-cover"
+          className="h-24 w-24 shrink-0 rounded object-cover"
+          loading="lazy"
           onError={(e) => (e.currentTarget.style.display = "none")}
         />
       )}
       <div className="min-w-0 flex-1">
-        <h3 className="font-medium">{title}</h3>
-        {item.description && (
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="font-medium">{title}</h3>
+          {date && <span className="shrink-0 text-xs text-muted-foreground">{date}</span>}
+        </div>
+        {desc && (
           <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
-            {String(item.description).replace(/<[^>]+>/g, "")}
+            {String(desc).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()}
           </p>
+        )}
+        {categories.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1">
+            {categories.slice(0, 4).map((c, i) => (
+              <span key={i} className="rounded-full border px-2 py-0.5 text-[10px] text-muted-foreground">
+                {c.categoryTitle}
+              </span>
+            ))}
+          </div>
         )}
       </div>
     </article>
