@@ -128,19 +128,6 @@ function Index() {
           )}
         </section>
 
-        <section id="posts" className="space-y-4">
-          <h2 className="text-xl font-semibold">Posts</h2>
-          {posts.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No posts.</p>
-          ) : (
-            <div className="space-y-3">
-              {posts.map((p: any, i: number) => (
-                <PostRow key={p.id ?? i} item={p} />
-              ))}
-            </div>
-          )}
-        </section>
-      </main>
     </div>
   );
 }
