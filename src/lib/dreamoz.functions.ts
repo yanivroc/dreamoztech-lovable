@@ -7,9 +7,13 @@ export const getDreamozData = createServerFn({ method: "GET" }).handler(async ()
     dreamozGet("/Member/Products"),
     dreamozGet("/Member/Posts"),
   ]);
+  const rawPosts = posts?.posts ?? posts?.Posts ?? [];
+  const visiblePosts = rawPosts.filter(
+    (p: any) => p.bizEnable === true && p.bizPublic === true
+  );
   return {
     member: member?.member ?? null,
     products: products?.products?.posts ?? products?.posts ?? [],
-    posts: posts?.posts ?? posts?.Posts ?? [],
+    posts: visiblePosts,
   };
 });
