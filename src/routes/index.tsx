@@ -34,7 +34,7 @@ function resolveImg(path?: string | null) {
 
 function Index() {
   const { data } = useSuspenseQuery(dataQuery);
-  const { member, products, posts } = data;
+  const { member, products } = data;
 
   const avatar = resolveImg(member?.profilePicture);
   const lat = member?.bizLat;
@@ -54,7 +54,7 @@ function Index() {
           <ul className="flex items-center gap-4 text-sm">
             <li><a href="#home" className="hover:text-primary">Home</a></li>
             <li><a href="#products" className="hover:text-primary">Products</a></li>
-            <li><a href="#posts" className="hover:text-primary">Posts</a></li>
+            
             {member?.facebookProfile && (
               <li>
                 <a href={member.facebookProfile} target="_blank" rel="noreferrer" aria-label="Facebook">
@@ -123,19 +123,6 @@ function Index() {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {products.map((p: any, i: number) => (
                 <ItemCard key={p.id ?? i} item={p} />
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section id="posts" className="space-y-4">
-          <h2 className="text-xl font-semibold">Posts</h2>
-          {posts.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No posts.</p>
-          ) : (
-            <div className="space-y-3">
-              {posts.map((p: any, i: number) => (
-                <PostRow key={p.id ?? i} item={p} />
               ))}
             </div>
           )}
