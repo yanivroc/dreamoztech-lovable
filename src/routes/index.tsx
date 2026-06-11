@@ -87,7 +87,7 @@ function Index() {
               <img
                 src={avatar}
                 alt={member?.memberFullName ?? "Profile"}
-                className="h-28 w-28 rounded-full object-cover border"
+                className="h-40 w-40 rounded-full object-cover border"
                 onError={(e) => (e.currentTarget.style.display = "none")}
               />
             )}
