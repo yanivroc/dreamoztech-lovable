@@ -10,6 +10,6 @@ export const getDreamozData = createServerFn({ method: "GET" }).handler(async ()
   return {
     member: member?.member ?? null,
     products: products?.products?.posts ?? products?.posts ?? [],
-    posts: posts?.posts ?? [],
+    posts: posts?.posts ?? posts?.Posts ?? [],
   };
 });
