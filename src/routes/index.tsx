@@ -82,7 +82,7 @@ function Index() {
 
       <main className="mx-auto max-w-5xl px-4 py-8 space-y-12">
         <section id="home" className="rounded-xl border bg-card p-6 shadow-sm">
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+          <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center">
             {avatar && (
               <img
                 src={avatar}
