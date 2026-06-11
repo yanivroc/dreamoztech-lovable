@@ -9,7 +9,10 @@ export const getDreamozData = createServerFn({ method: "GET" }).handler(async ()
   ]);
   const rawPosts = posts?.posts ?? posts?.Posts ?? [];
   const visiblePosts = rawPosts.filter(
-    (p: any) => p.bizEnable === true && p.bizPublic === true
+    (p: any) =>
+      p.bizEnable === true &&
+      p.bizPublic === true &&
+      String(p.postType ?? "").toLowerCase() !== "product"
   );
   return {
     member: member?.member ?? null,
