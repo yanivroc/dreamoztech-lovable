@@ -146,24 +146,47 @@ function Index() {
 }
 
 function ItemCard({ item }: { item: any }) {
-  const img = resolveImg(item.image ?? item.picture ?? item.thumbnail);
-  const title = item.title ?? item.name ?? "Untitled";
+  const pic = Array.isArray(item.pics) && item.pics.length > 0
+    ? [...item.pics].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))[0]
+    : null;
+  const img = resolveImg(pic?.picThumbPath ?? pic?.picPath ?? item.image);
+  const title = item.bizName ?? item.title ?? "Untitled";
+  const priceAttr = Array.isArray(item.attributes)
+    ? item.attributes.find((a: any) => String(a.name ?? a.key ?? "").toLowerCase() === "price")
+    : null;
+  const price = priceAttr?.value ?? priceAttr?.price;
+  const categories: any[] = Array.isArray(item.categories) ? item.categories : [];
+  const desc = item.bizDesc ?? item.description;
+
   return (
-    <article className="overflow-hidden rounded-lg border bg-card shadow-sm transition hover:shadow-md">
+    <article className="overflow-hidden rounded-lg border bg-card shadow-sm transition hover:shadow-md flex flex-col">
       {img && (
         <img
           src={img}
           alt={title}
-          className="h-40 w-full object-cover"
+          className="h-44 w-full object-cover"
+          loading="lazy"
           onError={(e) => (e.currentTarget.style.display = "none")}
         />
       )}
-      <div className="p-4 space-y-1">
+      <div className="p-4 space-y-2 flex-1 flex flex-col">
         <h3 className="font-medium line-clamp-2">{title}</h3>
-        {item.description && (
-          <p className="text-xs text-muted-foreground line-clamp-2">
-            {String(item.description).replace(/<[^>]+>/g, "")}
+        {price != null && (
+          <div className="text-primary font-semibold">${price}</div>
+        )}
+        {desc && (
+          <p className="text-xs text-muted-foreground line-clamp-3">
+            {String(desc).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()}
           </p>
+        )}
+        {categories.length > 0 && (
+          <div className="mt-auto flex flex-wrap gap-1 pt-2">
+            {categories.slice(0, 4).map((c, i) => (
+              <span key={i} className="rounded-full border px-2 py-0.5 text-[10px] text-muted-foreground">
+                {c.categoryTitle}
+              </span>
+            ))}
+          </div>
         )}
       </div>
     </article>
