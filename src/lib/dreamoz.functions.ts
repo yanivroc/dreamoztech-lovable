@@ -14,9 +14,14 @@ export const getDreamozData = createServerFn({ method: "GET" }).handler(async ()
       p.bizPublic === true &&
       String(p.postType ?? "").toLowerCase() !== "product"
   );
+  const rawProducts = products?.products?.posts ?? products?.posts ?? [];
+  const visibleProducts = rawProducts.filter((p: any) => {
+    const t = String(p.bizDisplayTitle ?? "").trim().toLowerCase();
+    return t.length > 0 && t !== "new-product";
+  });
   return {
     member: member?.member ?? null,
-    products: products?.products?.posts ?? products?.posts ?? [],
+    products: visibleProducts,
     posts: visiblePosts,
   };
 });

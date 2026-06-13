@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
+import { useState } from "react";
 import { getDreamozData } from "@/lib/dreamoz.functions";
 import { Facebook, Twitter, Instagram } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const IMG_BASE = "https://dreamoztech.com/";
 
@@ -82,24 +84,24 @@ function Index() {
 
       <main className="mx-auto max-w-5xl px-4 py-8 space-y-12">
         <section id="home" className="rounded-xl border bg-card p-6 shadow-sm">
-          <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center">
+          <div className="flex flex-col items-center gap-6 text-center">
+            <div className="space-y-3">
+              <h1 className="text-2xl font-bold">{member?.memberFullName ?? "—"}</h1>
+            </div>
             {avatar && (
               <img
                 src={avatar}
                 alt={member?.memberFullName ?? "Profile"}
-                className="h-40 w-40 rounded-full object-cover border"
+                className="w-[200px] min-w-[200px] rounded-lg object-cover border"
                 onError={(e) => (e.currentTarget.style.display = "none")}
               />
             )}
-            <div className="flex-1 space-y-3">
-              <h1 className="text-2xl font-bold">{member?.memberFullName ?? "—"}</h1>
-              {member?.description && (
-                <div
-                  className="prose prose-sm max-w-none text-foreground/90"
-                  dangerouslySetInnerHTML={{ __html: member.description }}
-                />
-              )}
-            </div>
+            {member?.description && (
+              <div
+                className="prose prose-sm max-w-none text-foreground/90 text-left"
+                dangerouslySetInnerHTML={{ __html: member.description }}
+              />
+            )}
           </div>
 
           {mapSrc && (
@@ -133,50 +135,82 @@ function Index() {
 }
 
 function ItemCard({ item }: { item: any }) {
+  const [open, setOpen] = useState(false);
   const pic = Array.isArray(item.pics) && item.pics.length > 0
     ? [...item.pics].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))[0]
     : null;
   const img = resolveImg(pic?.picThumbPath ?? pic?.picPath ?? item.image);
   const title = item.bizName ?? item.title ?? "Untitled";
   const priceAttr = Array.isArray(item.attributes)
-    ? item.attributes.find((a: any) => String(a.name ?? a.key ?? "").toLowerCase() === "price")
+    ? item.attributes.find(
+        (a: any) =>
+          String(a.title ?? a.name ?? a.key ?? "").toLowerCase() === "price"
+      )
     : null;
   const price = priceAttr?.value ?? priceAttr?.price;
   const categories: any[] = Array.isArray(item.categories) ? item.categories : [];
   const desc = item.bizDesc ?? item.description;
+  const fullImg = resolveImg(pic?.picPath ?? pic?.picThumbPath ?? item.image);
 
   return (
-    <article className="overflow-hidden rounded-lg border bg-card shadow-sm transition hover:shadow-md flex flex-col">
-      {img && (
-        <img
-          src={img}
-          alt={title}
-          className="h-44 w-full object-cover"
-          loading="lazy"
-          onError={(e) => (e.currentTarget.style.display = "none")}
-        />
-      )}
-      <div className="p-4 space-y-2 flex-1 flex flex-col">
-        <h3 className="font-medium line-clamp-2">{title}</h3>
-        {price != null && (
-          <div className="text-primary font-semibold">${price}</div>
+    <>
+      <article
+        onClick={() => setOpen(true)}
+        className="cursor-pointer overflow-hidden rounded-lg border bg-card shadow-sm transition hover:shadow-md flex flex-col text-left"
+      >
+        {img && (
+          <img
+            src={img}
+            alt={title}
+            className="h-44 w-full object-cover"
+            loading="lazy"
+            onError={(e) => (e.currentTarget.style.display = "none")}
+          />
         )}
-        {desc && (
-          <p className="text-xs text-muted-foreground line-clamp-3">
-            {String(desc).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()}
-          </p>
-        )}
-        {categories.length > 0 && (
-          <div className="mt-auto flex flex-wrap gap-1 pt-2">
-            {categories.slice(0, 4).map((c, i) => (
-              <span key={i} className="rounded-full border px-2 py-0.5 text-[10px] text-muted-foreground">
-                {c.categoryTitle}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-    </article>
+        <div className="p-4 space-y-2 flex-1 flex flex-col">
+          <h3 className="font-medium line-clamp-2">{title}</h3>
+          {price != null && (
+            <div className="text-primary font-semibold">${price}</div>
+          )}
+          {categories.length > 0 && (
+            <div className="mt-auto flex flex-wrap gap-1 pt-2">
+              {categories.slice(0, 4).map((c, i) => (
+                <span key={i} className="rounded-full border px-2 py-0.5 text-[10px] text-muted-foreground">
+                  {c.categoryTitle}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </article>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{title}</DialogTitle>
+          </DialogHeader>
+          {fullImg && (
+            <img
+              src={fullImg}
+              alt={title}
+              className="w-full max-h-80 object-contain rounded"
+              onError={(e) => (e.currentTarget.style.display = "none")}
+            />
+          )}
+          {price != null && (
+            <div className="text-primary text-lg font-semibold">${price}</div>
+          )}
+          {desc ? (
+            <div
+              className="prose prose-sm max-w-none text-foreground/90"
+              dangerouslySetInnerHTML={{ __html: String(desc) }}
+            />
+          ) : (
+            <p className="text-sm text-muted-foreground">No description available.</p>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
