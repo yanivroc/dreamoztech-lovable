@@ -72,14 +72,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "DreamozTech" },
+      { name: "description", content: "WebBuilder fetches data from API endpoints using authentication tokens and displays it in a user-friendly profile." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "DreamozTech" },
+      { property: "og:description", content: "WebBuilder fetches data from API endpoints using authentication tokens and displays it in a user-friendly profile." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "DreamozTech" },
+      { name: "twitter:description", content: "WebBuilder fetches data from API endpoints using authentication tokens and displays it in a user-friendly profile." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/32ae7279-8787-4f4b-815f-05703114261f/id-preview-6ed7a2de--39b09fea-184a-4f88-80db-fe544868e17c.lovable.app-1781393814800.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/32ae7279-8787-4f4b-815f-05703114261f/id-preview-6ed7a2de--39b09fea-184a-4f88-80db-fe544868e17c.lovable.app-1781393814800.png" },
     ],
     links: [
       {
