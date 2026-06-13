@@ -84,24 +84,24 @@ function Index() {
 
       <main className="mx-auto max-w-5xl px-4 py-8 space-y-12">
         <section id="home" className="rounded-xl border bg-card p-6 shadow-sm">
-          <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center">
+          <div className="flex flex-col items-center gap-6 text-center">
+            <div className="space-y-3">
+              <h1 className="text-2xl font-bold">{member?.memberFullName ?? "—"}</h1>
+            </div>
             {avatar && (
               <img
                 src={avatar}
                 alt={member?.memberFullName ?? "Profile"}
-                className="h-40 w-40 rounded-full object-cover border"
+                className="w-[200px] min-w-[200px] rounded-lg object-cover border"
                 onError={(e) => (e.currentTarget.style.display = "none")}
               />
             )}
-            <div className="flex-1 space-y-3">
-              <h1 className="text-2xl font-bold">{member?.memberFullName ?? "—"}</h1>
-              {member?.description && (
-                <div
-                  className="prose prose-sm max-w-none text-foreground/90"
-                  dangerouslySetInnerHTML={{ __html: member.description }}
-                />
-              )}
-            </div>
+            {member?.description && (
+              <div
+                className="prose prose-sm max-w-none text-foreground/90 text-left"
+                dangerouslySetInnerHTML={{ __html: member.description }}
+              />
+            )}
           </div>
 
           {mapSrc && (
