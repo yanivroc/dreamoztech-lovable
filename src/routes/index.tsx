@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getDreamozData } from "@/lib/dreamoz.functions";
 import { Facebook, Twitter, Instagram } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -13,12 +13,25 @@ const dataQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Member Profile" },
-      { name: "description", content: "Member profile, products and posts." },
-    ],
-  }),
+  head: ({ loaderData }: any) => {
+    const m = loaderData?.member;
+    const title = m?.memberFullName ?? "Member Profile";
+    const desc = m?.metaDesc ?? "Member profile, products and posts.";
+    const keywords = m?.metaKey ?? "";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        ...(keywords ? [{ name: "keywords", content: keywords }] : []),
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: desc },
+      ],
+    };
+  },
   ssr: false,
   loader: ({ context }) => context.queryClient.ensureQueryData(dataQuery),
   component: Index,
@@ -151,6 +164,40 @@ function ItemCard({ item }: { item: any }) {
   const categories: any[] = Array.isArray(item.categories) ? item.categories : [];
   const desc = item.bizDesc ?? item.description;
   const fullImg = resolveImg(pic?.picPath ?? pic?.picThumbPath ?? item.image);
+  const metaDesc = item.metaDesc ?? "";
+  const metaKey = item.metaKey ?? "";
+
+  useEffect(() => {
+    if (!open) return;
+    const prevTitle = document.title;
+    const setMeta = (selector: string, attr: string, name: string, content: string) => {
+      let el = document.head.querySelector<HTMLMetaElement>(selector);
+      const created = !el;
+      if (!el) {
+        el = document.createElement("meta");
+        el.setAttribute(attr, name);
+        document.head.appendChild(el);
+      }
+      const prev = el.getAttribute("content");
+      el.setAttribute("content", content);
+      return () => {
+        if (created) el!.remove();
+        else if (prev != null) el!.setAttribute("content", prev);
+      };
+    };
+    document.title = title;
+    const restores: Array<() => void> = [];
+    if (metaDesc) restores.push(setMeta('meta[name="description"]', "name", "description", metaDesc));
+    if (metaKey) restores.push(setMeta('meta[name="keywords"]', "name", "keywords", metaKey));
+    restores.push(setMeta('meta[property="og:title"]', "property", "og:title", title));
+    if (metaDesc) restores.push(setMeta('meta[property="og:description"]', "property", "og:description", metaDesc));
+    return () => {
+      document.title = prevTitle;
+      restores.forEach((r) => r());
+    };
+  }, [open, title, metaDesc, metaKey]);
+
+
 
   return (
     <>
