@@ -13,12 +13,25 @@ const dataQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Member Profile" },
-      { name: "description", content: "Member profile, products and posts." },
-    ],
-  }),
+  head: ({ loaderData }: any) => {
+    const m = loaderData?.member;
+    const title = m?.memberFullName ?? "Member Profile";
+    const desc = m?.metaDesc ?? "Member profile, products and posts.";
+    const keywords = m?.metaKey ?? "";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        ...(keywords ? [{ name: "keywords", content: keywords }] : []),
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: desc },
+      ],
+    };
+  },
   ssr: false,
   loader: ({ context }) => context.queryClient.ensureQueryData(dataQuery),
   component: Index,
