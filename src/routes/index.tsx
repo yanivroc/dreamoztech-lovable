@@ -164,6 +164,40 @@ function ItemCard({ item }: { item: any }) {
   const categories: any[] = Array.isArray(item.categories) ? item.categories : [];
   const desc = item.bizDesc ?? item.description;
   const fullImg = resolveImg(pic?.picPath ?? pic?.picThumbPath ?? item.image);
+  const metaDesc = item.metaDesc ?? "";
+  const metaKey = item.metaKey ?? "";
+
+  useEffect(() => {
+    if (!open) return;
+    const prevTitle = document.title;
+    const setMeta = (selector: string, attr: string, name: string, content: string) => {
+      let el = document.head.querySelector<HTMLMetaElement>(selector);
+      const created = !el;
+      if (!el) {
+        el = document.createElement("meta");
+        el.setAttribute(attr, name);
+        document.head.appendChild(el);
+      }
+      const prev = el.getAttribute("content");
+      el.setAttribute("content", content);
+      return () => {
+        if (created) el!.remove();
+        else if (prev != null) el!.setAttribute("content", prev);
+      };
+    };
+    document.title = title;
+    const restores: Array<() => void> = [];
+    if (metaDesc) restores.push(setMeta('meta[name="description"]', "name", "description", metaDesc));
+    if (metaKey) restores.push(setMeta('meta[name="keywords"]', "name", "keywords", metaKey));
+    restores.push(setMeta('meta[property="og:title"]', "property", "og:title", title));
+    if (metaDesc) restores.push(setMeta('meta[property="og:description"]', "property", "og:description", metaDesc));
+    return () => {
+      document.title = prevTitle;
+      restores.forEach((r) => r());
+    };
+  }, [open, title, metaDesc, metaKey]);
+
+
 
   return (
     <>
