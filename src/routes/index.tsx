@@ -122,12 +122,12 @@ function ItemCard({ item }: { item: any }) {
     : null;
   const price = priceAttr?.value ?? priceAttr?.price;
   const categories: any[] = Array.isArray(item.categories) ? item.categories : [];
-  const productId = String(item.id ?? "");
+  const slug = String(item.bizDisplayTitle ?? "");
 
   return (
     <Link
-      to="/products/$id"
-      params={{ id: productId }}
+      to="/$slug"
+      params={{ slug }}
       className="cursor-pointer overflow-hidden rounded-lg border bg-card shadow-sm transition hover:shadow-md flex flex-col text-left"
     >
       {img && (

@@ -8,13 +8,20 @@ const dataQuery = queryOptions({
   queryFn: () => getDreamozData(),
 });
 
-export const Route = createFileRoute("/products/$id")({
+function findProduct(products: any[], slug: string) {
+  const s = decodeURIComponent(slug).toLowerCase();
+  return products.find(
+    (p: any) => String(p.bizDisplayTitle ?? "").toLowerCase() === s
+  );
+}
+
+export const Route = createFileRoute("/$slug")({
   head: ({ loaderData, params }: any) => {
     const m = loaderData?.member;
     const brand = m?.memberFullName ?? "DreamozTech";
-    const product = loaderData?.products?.find(
-      (p: any) => String(p.id) === String(params.id)
-    );
+    const product = loaderData?.products
+      ? findProduct(loaderData.products, params.slug)
+      : null;
     const name = product?.bizName ?? "Product";
     const title = `${name} | ${brand}`;
     const desc = product?.metaDesc ?? m?.metaDesc ?? "";
@@ -43,10 +50,10 @@ export const Route = createFileRoute("/products/$id")({
 });
 
 function ProductPage() {
-  const { id } = Route.useParams();
+  const { slug } = Route.useParams();
   const { data } = useSuspenseQuery(dataQuery);
   const { member, products } = data;
-  const item = products.find((p: any) => String(p.id) === String(id));
+  const item = findProduct(products, slug);
 
   if (!item) {
     return (
@@ -61,10 +68,9 @@ function ProductPage() {
     );
   }
 
-  const pic = Array.isArray(item.pics) && item.pics.length > 0
-    ? [...item.pics].sort((a: any, b: any) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))[0]
-    : null;
-  const fullImg = resolveImg(pic?.picPath ?? pic?.picThumbPath ?? item.image);
+  const pics: any[] = Array.isArray(item.pics)
+    ? [...item.pics].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
+    : [];
   const title = item.bizName ?? "Untitled";
   const priceAttr = Array.isArray(item.attributes)
     ? item.attributes.find(
@@ -82,13 +88,23 @@ function ProductPage() {
         <Link to="/" className="text-sm text-muted-foreground hover:text-primary">&larr; Back</Link>
         <article className="rounded-xl border bg-card p-6 shadow-sm space-y-4">
           <h1 className="text-2xl font-bold">{title}</h1>
-          {fullImg && (
-            <img
-              src={fullImg}
-              alt={title}
-              className="w-full max-h-96 object-contain rounded"
-              onError={(e) => (e.currentTarget.style.display = "none")}
-            />
+          {pics.length > 0 && (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {pics.map((pic, i) => {
+                const src = resolveImg(pic.picPath ?? pic.picThumbPath);
+                if (!src) return null;
+                return (
+                  <img
+                    key={i}
+                    src={src}
+                    alt={pic.picDescription ?? `${title} image ${i + 1}`}
+                    className="w-full max-h-96 object-contain rounded border bg-background"
+                    loading={i === 0 ? "eager" : "lazy"}
+                    onError={(e) => (e.currentTarget.style.display = "none")}
+                  />
+                );
+              })}
+            </div>
           )}
           {price != null && (
             <div className="text-primary text-xl font-semibold">${price}</div>
