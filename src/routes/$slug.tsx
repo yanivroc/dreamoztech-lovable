@@ -193,3 +193,19 @@ function ProductPage() {
     </div>
   );
 }
+
+function AddToCartButton({
+  id, slug, title, price, image,
+}: { id: string; slug: string; title: string; price: number; image?: string }) {
+  const { add, setOpen } = useCart();
+  function handle() {
+    if (!isFinite(price) || price <= 0) {
+      toast.error("Price unavailable");
+      return;
+    }
+    add({ id, slug, title, price, image });
+    toast.success(`${title} added to cart`);
+    setOpen(true);
+  }
+  return <Button onClick={handle}>Add to Cart</Button>;
+}
