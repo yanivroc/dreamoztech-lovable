@@ -24,20 +24,67 @@ export const Route = createFileRoute("/$slug")({
       : null;
     const name = product?.bizName ?? "Product";
     const title = `${name} | ${brand}`;
-    const desc = product?.metaDesc ?? m?.metaDesc ?? "";
+    const desc = product?.metaDesc ?? product?.bizDesc ?? m?.metaDesc ?? "";
+    const plainDesc = typeof desc === "string" ? desc.replace(/<[^>]*>/g, "").slice(0, 300) : "";
     const keywords = product?.metaKey ?? "";
+    const url = `https://dreamoztech.lovable.app/${params.slug}`;
+    const pics = Array.isArray(product?.pics) ? product.pics : [];
+    const firstPic = pics.length
+      ? [...pics].sort((a: any, b: any) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))[0]
+      : null;
+    const rawImg = firstPic?.picPath ?? firstPic?.picThumbPath ?? null;
+    const img = rawImg
+      ? (String(rawImg).startsWith("http") ? rawImg : `https://dreamoztech.com${rawImg}`)
+      : null;
+    const priceAttr = Array.isArray(product?.attributes)
+      ? product.attributes.find(
+          (a: any) => String(a.title ?? a.name ?? a.key ?? "").toLowerCase() === "price"
+        )
+      : null;
+    const price = priceAttr?.value ?? priceAttr?.price;
     return {
       meta: [
         { title },
-        ...(desc ? [{ name: "description", content: desc }] : []),
+        ...(plainDesc ? [{ name: "description", content: plainDesc }] : []),
         ...(keywords ? [{ name: "keywords", content: keywords }] : []),
         { property: "og:title", content: title },
-        ...(desc ? [{ property: "og:description", content: desc }] : []),
+        ...(plainDesc ? [{ property: "og:description", content: plainDesc }] : []),
+        { property: "og:url", content: url },
         { property: "og:type", content: "product" },
-        { name: "twitter:card", content: "summary" },
+        ...(img ? [{ property: "og:image", content: img }] : []),
+        { name: "twitter:card", content: img ? "summary_large_image" : "summary" },
         { name: "twitter:title", content: title },
-        ...(desc ? [{ name: "twitter:description", content: desc }] : []),
+        ...(plainDesc ? [{ name: "twitter:description", content: plainDesc }] : []),
+        ...(img ? [{ name: "twitter:image", content: img }] : []),
       ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: product
+        ? [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Product",
+                name,
+                description: plainDesc || undefined,
+                image: img || undefined,
+                url,
+                brand: { "@type": "Brand", name: brand },
+                ...(price != null
+                  ? {
+                      offers: {
+                        "@type": "Offer",
+                        price: String(price),
+                        priceCurrency: "USD",
+                        availability: "https://schema.org/InStock",
+                        url,
+                      },
+                    }
+                  : {}),
+              }),
+            },
+          ]
+        : [],
     };
   },
   ssr: false,
