@@ -22,6 +22,7 @@ export function SiteHeader({ member }: { member: any }) {
         <ul className="flex items-center gap-4 text-sm">
           <li><Link to="/" className="hover:text-primary">Home</Link></li>
           <li><Link to="/" hash="products" className="hover:text-primary">Products</Link></li>
+          <li><Link to="/" hash="contact" className="hover:text-primary">Contact</Link></li>
           {member?.facebookProfile && (
             <li>
               <a href={member.facebookProfile} target="_blank" rel="noreferrer" aria-label="Facebook">
