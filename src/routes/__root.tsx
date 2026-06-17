@@ -72,24 +72,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "DreamozTech" },
-      { name: "description", content: "DreamozTech is your all-in-one digital tech mart, bringing everything from everyday accessories to the latest gadgets straight to your doorstep." },
       { name: "author", content: "DreamozTech" },
-      { property: "og:title", content: "DreamozTech" },
-      { property: "og:description", content: "DreamozTech is your all-in-one digital tech mart, bringing everything from everyday accessories to the latest gadgets straight to your doorstep." },
+      { property: "og:site_name", content: "DreamozTech" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@DreamozTech" },
-      { name: "twitter:title", content: "DreamozTech" },
-      { name: "twitter:description", content: "DreamozTech is your all-in-one digital tech mart, bringing everything from everyday accessories to the latest gadgets straight to your doorstep." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/32ae7279-8787-4f4b-815f-05703114261f/id-preview-6ed7a2de--39b09fea-184a-4f88-80db-fe544868e17c.lovable.app-1781393814800.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/32ae7279-8787-4f4b-815f-05703114261f/id-preview-6ed7a2de--39b09fea-184a-4f88-80db-fe544868e17c.lovable.app-1781393814800.png" },
     ],
     links: [
       { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
       {
         rel: "stylesheet",
         href: appCss,
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "DreamozTech",
+          url: "https://dreamoztech.lovable.app",
+        }),
       },
     ],
   }),
