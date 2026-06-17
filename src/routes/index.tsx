@@ -13,8 +13,10 @@ export const Route = createFileRoute("/")({
     const m = loaderData?.member;
     const brand = m?.memberFullName ?? "DreamozTech";
     const title = `Home | ${brand}`;
-    const desc = m?.metaDesc ?? "Member profile, products and posts.";
+    const desc = m?.metaDesc ?? "DreamozTech is your all-in-one digital tech mart, bringing everything from everyday accessories to the latest gadgets straight to your doorstep.";
     const keywords = m?.metaKey ?? "";
+    const url = "https://dreamoztech.lovable.app/";
+    const img = m?.profilePicture ? (String(m.profilePicture).startsWith("http") ? m.profilePicture : `https://dreamoztech.com${m.profilePicture}`) : null;
     return {
       meta: [
         { title },
@@ -22,11 +24,14 @@ export const Route = createFileRoute("/")({
         ...(keywords ? [{ name: "keywords", content: keywords }] : []),
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
+        { property: "og:url", content: url },
         { property: "og:type", content: "website" },
-        { name: "twitter:card", content: "summary" },
+        ...(img ? [{ property: "og:image", content: img }] : []),
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: desc },
+        ...(img ? [{ name: "twitter:image", content: img }] : []),
       ],
+      links: [{ rel: "canonical", href: url }],
     };
   },
   ssr: false,
