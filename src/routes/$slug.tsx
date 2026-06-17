@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { getDreamozData } from "@/lib/dreamoz.functions";
 import { SiteHeader, SiteFooter, resolveImg } from "@/components/SiteChrome";
+import { currencyForCountry, formatPrice } from "@/lib/currency";
 
 const dataQuery = queryOptions({
   queryKey: ["dreamoz"],
