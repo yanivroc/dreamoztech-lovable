@@ -42,7 +42,6 @@ function Index() {
   const { data } = useSuspenseQuery(dataQuery);
   const { member, products } = data;
 
-  const avatar = resolveImg(member?.profilePicture);
   const lat = member?.bizLat;
   const lng = member?.bizLong;
   const hasCoords = lat != null && lng != null && !isNaN(Number(lat)) && !isNaN(Number(lng));
@@ -57,20 +56,9 @@ function Index() {
       <main className="mx-auto w-full max-w-5xl px-4 py-8 space-y-12 flex-1">
         <section id="home" className="rounded-xl border bg-card p-6 shadow-sm">
           <div className="flex flex-col items-center gap-6 text-center">
-            <div className="space-y-3">
-              <h1 className="text-2xl font-bold">{member?.memberFullName ?? "—"}</h1>
-            </div>
-            {avatar && (
-              <img
-                src={avatar}
-                alt={member?.memberFullName ?? "Profile"}
-                className="w-[200px] min-w-[200px] rounded-lg object-cover border"
-                onError={(e) => (e.currentTarget.style.display = "none")}
-              />
-            )}
             {member?.description && (
               <div
-                className="prose prose-sm max-w-none text-foreground/90 text-left"
+                className="prose prose-sm max-w-none text-foreground/90 text-left w-full"
                 dangerouslySetInnerHTML={{ __html: member.description }}
               />
             )}
