@@ -155,7 +155,7 @@ function ProductPage() {
             </div>
           )}
           {price != null && (
-            <div className="text-primary text-xl font-semibold">${price}</div>
+            <div className="text-primary text-xl font-semibold">{formatPrice(price, member?.country)}</div>
           )}
           {categories.length > 0 && (
             <div className="flex flex-wrap gap-1">
