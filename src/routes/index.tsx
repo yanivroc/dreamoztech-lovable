@@ -118,7 +118,7 @@ function Index() {
   );
 }
 
-function ItemCard({ item }: { item: any }) {
+function ItemCard({ item, country }: { item: any; country?: string | null }) {
   const pic = Array.isArray(item.pics) && item.pics.length > 0
     ? [...item.pics].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))[0]
     : null;
@@ -152,7 +152,7 @@ function ItemCard({ item }: { item: any }) {
       <div className="p-4 space-y-2 flex-1 flex flex-col">
         <h3 className="font-medium line-clamp-2">{title}</h3>
         {price != null && (
-          <div className="text-primary font-semibold">${price}</div>
+          <div className="text-primary font-semibold">{formatPrice(price, country)}</div>
         )}
         {categories.length > 0 && (
           <div className="mt-auto flex flex-wrap gap-1 pt-2">
