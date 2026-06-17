@@ -4,6 +4,9 @@ import { getDreamozData } from "@/lib/dreamoz.functions";
 import { SiteHeader, SiteFooter, resolveImg } from "@/components/SiteChrome";
 import { ContactForm } from "@/components/ContactForm";
 import { formatPrice } from "@/lib/currency";
+import { useCart } from "@/lib/cart";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const dataQuery = queryOptions({
   queryKey: ["dreamoz"],
@@ -119,6 +122,7 @@ function Index() {
 }
 
 function ItemCard({ item, country }: { item: any; country?: string | null }) {
+  const { add, setOpen } = useCart();
   const pic = Array.isArray(item.pics) && item.pics.length > 0
     ? [...item.pics].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))[0]
     : null;
@@ -130,32 +134,46 @@ function ItemCard({ item, country }: { item: any; country?: string | null }) {
           String(a.title ?? a.name ?? a.key ?? "").toLowerCase() === "price"
       )
     : null;
-  const price = priceAttr?.value ?? priceAttr?.price;
+  const priceRaw = priceAttr?.value ?? priceAttr?.price;
+  const priceNum = Number(priceRaw);
   const categories: any[] = Array.isArray(item.categories) ? item.categories : [];
   const slug = String(item.bizDisplayTitle ?? "");
+  const id = String(item.id ?? slug);
+
+  function handleAdd(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isFinite(priceNum) || priceNum <= 0) {
+      toast.error("Price unavailable");
+      return;
+    }
+    add({ id, slug, title, price: priceNum, image: img });
+    toast.success(`${title} added to cart`);
+    setOpen(true);
+  }
 
   return (
-    <Link
-      to="/$slug"
-      params={{ slug }}
-      className="cursor-pointer overflow-hidden rounded-lg border bg-card shadow-sm transition hover:shadow-md flex flex-col text-left"
-    >
-      {img && (
-        <img
-          src={img}
-          alt={`${title}${categories.length > 0 ? ` - ${categories[0].categoryTitle}` : " product image"}`}
-          className="h-44 w-full object-cover"
-          loading="lazy"
-          onError={(e) => (e.currentTarget.style.display = "none")}
-        />
-      )}
+    <div className="overflow-hidden rounded-lg border bg-card shadow-sm transition hover:shadow-md flex flex-col text-left">
+      <Link to="/$slug" params={{ slug }} className="block">
+        {img && (
+          <img
+            src={img}
+            alt={`${title}${categories.length > 0 ? ` - ${categories[0].categoryTitle}` : " product image"}`}
+            className="h-44 w-full object-cover"
+            loading="lazy"
+            onError={(e) => (e.currentTarget.style.display = "none")}
+          />
+        )}
+      </Link>
       <div className="p-4 space-y-2 flex-1 flex flex-col">
-        <h3 className="font-medium line-clamp-2">{title}</h3>
-        {price != null && (
-          <div className="text-primary font-semibold">{formatPrice(price, country)}</div>
+        <Link to="/$slug" params={{ slug }}>
+          <h3 className="font-medium line-clamp-2 hover:text-primary">{title}</h3>
+        </Link>
+        {priceRaw != null && (
+          <div className="text-primary font-semibold">{formatPrice(priceRaw, country)}</div>
         )}
         {categories.length > 0 && (
-          <div className="mt-auto flex flex-wrap gap-1 pt-2">
+          <div className="flex flex-wrap gap-1">
             {categories.slice(0, 4).map((c, i) => (
               <span key={i} className="rounded-full border px-2 py-0.5 text-[10px] text-muted-foreground">
                 {c.categoryTitle}
@@ -163,7 +181,10 @@ function ItemCard({ item, country }: { item: any; country?: string | null }) {
             ))}
           </div>
         )}
+        <Button size="sm" className="mt-auto w-full" onClick={handleAdd}>
+          Add to Cart
+        </Button>
       </div>
-    </Link>
+    </div>
   );
 }
