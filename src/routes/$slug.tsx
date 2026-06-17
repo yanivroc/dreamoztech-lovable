@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { getDreamozData } from "@/lib/dreamoz.functions";
 import { SiteHeader, SiteFooter, resolveImg } from "@/components/SiteChrome";
+import { currencyForCountry, formatPrice } from "@/lib/currency";
 
 const dataQuery = queryOptions({
   queryKey: ["dreamoz"],
@@ -75,7 +76,7 @@ export const Route = createFileRoute("/$slug")({
                       offers: {
                         "@type": "Offer",
                         price: String(price),
-                        priceCurrency: "USD",
+                        priceCurrency: currencyForCountry(m?.country),
                         availability: "https://schema.org/InStock",
                         url,
                       },
@@ -154,7 +155,7 @@ function ProductPage() {
             </div>
           )}
           {price != null && (
-            <div className="text-primary text-xl font-semibold">${price}</div>
+            <div className="text-primary text-xl font-semibold">{formatPrice(price, member?.country)}</div>
           )}
           {categories.length > 0 && (
             <div className="flex flex-wrap gap-1">
