@@ -168,9 +168,10 @@ function ProductPage() {
           )}
           {desc ? (
             <div
-              className="prose prose-sm max-w-none text-foreground/90"
+              className="rich-content"
               dangerouslySetInnerHTML={{ __html: String(desc) }}
             />
+
           ) : (
             <p className="text-sm text-muted-foreground">No description available.</p>
           )}
