@@ -41,3 +41,29 @@ To ensure a smooth setup, **you must configure your content backend first** befo
 2. Paste your **DreamozTech API Key** into the designated variable field:
 ```env
    VITE_DREAMOZTECH_API_KEY="your_api_key_here"
+```
+
+---
+
+## 🌐 Connecting a Custom Domain
+
+You can connect your own domain (or subdomain) to your published Lovable app.
+
+### Prerequisites
+- Your project must be **published** first (it will have a `.lovable.app` URL).
+
+### Steps
+1. Go to **Project Settings → Domains** (or click **Publish → Add custom domain**).
+2. Click **Connect Domain** and enter your full domain or subdomain (e.g. `shop.yourdomain.com`).
+3. Lovable will provide DNS records to add at your registrar:
+   - **A Record** — Name: `@` (root) or your subdomain, Value: `185.158.133.1`
+   - **TXT Record** — Name: `_lovable`, Value: the verification string shown in Lovable
+4. Add those records at your domain registrar/DNS provider, then return to Lovable and confirm.
+5. Wait for DNS propagation (up to 72 hours). Lovable will automatically verify and issue SSL.
+
+### Tips
+- If you use **Cloudflare proxy**, check the "Domain uses Cloudflare or a similar proxy" option in the advanced setup during connection. This switches to CNAME-based verification.
+- Add both `yourdomain.com` and `www.yourdomain.com` if you want both to resolve.
+- For domains purchased through Lovable, you can manage DNS records directly in **Project Settings → Domains → Configure → Manage DNS records**.
+
+For more details, see the [Lovable Custom Domain docs](https://docs.lovable.dev/features/custom-domain)
