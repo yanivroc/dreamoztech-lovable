@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
@@ -7,6 +7,10 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { CartProvider } from "@/lib/cart";
+import { CartDrawer } from "@/components/CartDrawer";
+import { Toaster } from "@/components/ui/sonner";
+import { getDreamozData } from "@/lib/dreamoz.functions";
 
 import appCss from "../styles.css?url";
 
@@ -128,7 +132,16 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <CartProvider>
+        <Outlet />
+        <CartDrawerMount />
+        <Toaster richColors position="top-right" />
+      </CartProvider>
     </QueryClientProvider>
   );
+}
+
+function CartDrawerMount() {
+  const { data } = useQuery({ queryKey: ["dreamoz"], queryFn: () => getDreamozData(), staleTime: Infinity });
+  return <CartDrawer country={data?.member?.country} />;
 }
