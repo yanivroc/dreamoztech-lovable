@@ -129,7 +129,7 @@ function ItemCard({ item }: { item: any }) {
       {img && (
         <img
           src={img}
-          alt={title}
+          alt={`${title}${categories.length > 0 ? ` - ${categories[0].categoryTitle}` : " product image"}`}
           className="h-44 w-full object-cover"
           loading="lazy"
           onError={(e) => (e.currentTarget.style.display = "none")}
