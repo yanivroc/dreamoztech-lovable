@@ -76,7 +76,7 @@ export const Route = createFileRoute("/$slug")({
                       offers: {
                         "@type": "Offer",
                         price: String(price),
-                        priceCurrency: "USD",
+                        priceCurrency: currencyForCountry(m?.country),
                         availability: "https://schema.org/InStock",
                         url,
                       },
