@@ -68,7 +68,7 @@ function Index() {
           {member?.description && (
             <div className="mt-6 flex flex-col items-center gap-6 text-center">
               <div
-                className="prose prose-sm max-w-none text-foreground/90 text-left w-full"
+                className="rich-content text-left w-full"
                 dangerouslySetInnerHTML={{ __html: member.description }}
               />
             </div>
