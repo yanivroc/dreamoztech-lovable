@@ -67,6 +67,7 @@ export function SiteFooter({ member }: { member: any }) {
           <ul className="space-y-1 text-sm">
             <li><Link to="/" className="text-muted-foreground hover:text-primary">Home</Link></li>
             <li><Link to="/" hash="products" className="text-muted-foreground hover:text-primary">Products</Link></li>
+            <li><Link to="/" hash="contact" className="text-muted-foreground hover:text-primary">Contact</Link></li>
           </ul>
         </div>
         <div>
