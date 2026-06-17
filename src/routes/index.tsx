@@ -60,6 +60,9 @@ function Index() {
 
       <main className="mx-auto w-full max-w-5xl px-4 py-8 space-y-12 flex-1">
         <section id="home" className="rounded-xl border bg-card p-6 shadow-sm">
+          <h1 className="text-3xl font-bold text-center mb-4">
+            {member?.memberFullName ?? "DreamozTech"}: Your All-in-One Digital Tech Mart
+          </h1>
           <div className="flex flex-col items-center gap-6 text-center">
             {member?.description && (
               <div
