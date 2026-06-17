@@ -5,9 +5,20 @@ export function SiteHeader({ member }: { member: any }) {
   return (
     <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
       <nav className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-        <div className="font-semibold tracking-tight truncate">
-          {member?.memberFullName ?? "Member"}
-        </div>
+        <Link to="/" className="flex items-center">
+          {member?.profilePicture ? (
+            <img
+              src={resolveImg(member.profilePicture) ?? undefined}
+              alt={member?.memberFullName ?? "DreamozTech"}
+              className="h-8 w-auto object-contain"
+              onError={(e) => (e.currentTarget.style.display = "none")}
+            />
+          ) : (
+            <span className="font-semibold tracking-tight truncate">
+              {member?.memberFullName ?? "DreamozTech"}
+            </span>
+          )}
+        </Link>
         <ul className="flex items-center gap-4 text-sm">
           <li><Link to="/" className="hover:text-primary">Home</Link></li>
           <li><Link to="/" hash="products" className="hover:text-primary">Products</Link></li>
