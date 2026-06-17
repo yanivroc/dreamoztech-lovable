@@ -9,7 +9,7 @@ export function SiteHeader({ member }: { member: any }) {
           {member?.profilePicture ? (
             <img
               src={resolveImg(member.profilePicture) ?? undefined}
-              alt={member?.memberFullName ?? "DreamozTech"}
+              alt={`${member?.memberFullName ?? "DreamozTech"} Logo`}
               className="h-8 w-auto object-contain"
               onError={(e) => (e.currentTarget.style.display = "none")}
             />
