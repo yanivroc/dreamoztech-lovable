@@ -65,23 +65,11 @@ function Index() {
           <h1 className="text-3xl font-bold text-center mb-4">
             {member?.memberFullName ?? "DreamozTech"}: Your All-in-One Digital Tech Mart
           </h1>
-          <div className="flex flex-col items-center gap-6 text-center">
-            {member?.description && (
+          {member?.description && (
+            <div className="mt-6 flex flex-col items-center gap-6 text-center">
               <div
                 className="prose prose-sm max-w-none text-foreground/90 text-left w-full"
                 dangerouslySetInnerHTML={{ __html: member.description }}
-              />
-            )}
-          </div>
-
-          {mapSrc && (
-            <div className="mt-6 overflow-hidden rounded-lg border">
-              <iframe
-                title="Location map"
-                src={mapSrc}
-                className="h-72 w-full"
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
               />
             </div>
           )}
@@ -94,10 +82,34 @@ function Index() {
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {products.map((p: any, i: number) => (
-                <ItemCard key={p.id ?? i} item={p} />
+                <ItemCard key={p.id ?? i} item={p} country={member?.country} />
               ))}
             </div>
           )}
+        </section>
+
+        <section id="contact" className="space-y-4">
+          <h2 className="text-xl font-semibold">Contact Us</h2>
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="rounded-xl border bg-card p-6 shadow-sm">
+              <ContactForm />
+            </div>
+            {mapSrc ? (
+              <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+                <iframe
+                  title="Location map"
+                  src={mapSrc}
+                  className="h-full min-h-[420px] w-full"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+            ) : (
+              <div className="rounded-xl border bg-card p-6 shadow-sm text-sm text-muted-foreground">
+                Location coming soon.
+              </div>
+            )}
+          </div>
         </section>
       </main>
 
