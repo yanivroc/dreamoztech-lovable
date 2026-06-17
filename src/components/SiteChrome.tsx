@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 import { Facebook, Twitter, Instagram } from "lucide-react";
-import { resolveImg } from "./SiteChrome";
 
 export function SiteHeader({ member }: { member: any }) {
   return (
