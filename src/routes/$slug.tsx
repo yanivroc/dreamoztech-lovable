@@ -3,6 +3,9 @@ import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { getDreamozData } from "@/lib/dreamoz.functions";
 import { SiteHeader, SiteFooter, resolveImg } from "@/components/SiteChrome";
 import { currencyForCountry, formatPrice } from "@/lib/currency";
+import { useCart } from "@/lib/cart";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const dataQuery = queryOptions({
   queryKey: ["dreamoz"],
@@ -155,7 +158,16 @@ function ProductPage() {
             </div>
           )}
           {price != null && (
-            <div className="text-primary text-xl font-semibold">{formatPrice(price, member?.country)}</div>
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="text-primary text-xl font-semibold">{formatPrice(price, member?.country)}</div>
+              <AddToCartButton
+                id={String(item.id ?? slug)}
+                slug={slug}
+                title={title}
+                price={Number(price)}
+                image={resolveImg(pics[0]?.picThumbPath ?? pics[0]?.picPath) ?? undefined}
+              />
+            </div>
           )}
           {categories.length > 0 && (
             <div className="flex flex-wrap gap-1">
@@ -180,4 +192,20 @@ function ProductPage() {
       <SiteFooter member={member} />
     </div>
   );
+}
+
+function AddToCartButton({
+  id, slug, title, price, image,
+}: { id: string; slug: string; title: string; price: number; image?: string }) {
+  const { add, setOpen } = useCart();
+  function handle() {
+    if (!isFinite(price) || price <= 0) {
+      toast.error("Price unavailable");
+      return;
+    }
+    add({ id, slug, title, price, image });
+    toast.success(`${title} added to cart`);
+    setOpen(true);
+  }
+  return <Button onClick={handle}>Add to Cart</Button>;
 }
