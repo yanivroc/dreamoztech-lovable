@@ -58,13 +58,26 @@ export function CartProvider({ children }: { children: ReactNode }) {
       add: (item, qty = 1) =>
         setItems((prev) => {
           const ex = prev.find((p) => p.id === item.id);
-          if (ex) return prev.map((p) => (p.id === item.id ? { ...p, qty: p.qty + qty } : p));
-          return [...prev, { ...item, qty }];
+          const max = item.maxQty ?? ex?.maxQty;
+          if (ex) {
+            const target = ex.qty + qty;
+            const capped = max != null ? Math.min(target, max) : target;
+            if (capped === ex.qty) return prev;
+            return prev.map((p) => (p.id === item.id ? { ...p, qty: capped, minQty: item.minQty ?? p.minQty, maxQty: max } : p));
+          }
+          const initial = max != null ? Math.min(Math.max(qty, item.minQty ?? 1), max) : Math.max(qty, item.minQty ?? 1);
+          return [...prev, { ...item, qty: initial }];
         }),
       remove: (id) => setItems((p) => p.filter((i) => i.id !== id)),
       setQty: (id, qty) =>
         setItems((p) =>
-          qty <= 0 ? p.filter((i) => i.id !== id) : p.map((i) => (i.id === id ? { ...i, qty } : i)),
+          p.flatMap((i) => {
+            if (i.id !== id) return [i];
+            const min = i.minQty ?? 1;
+            if (qty < min) return [];
+            const capped = i.maxQty != null ? Math.min(qty, i.maxQty) : qty;
+            return [{ ...i, qty: capped }];
+          }),
         ),
       clear: () => setItems([]),
     };
