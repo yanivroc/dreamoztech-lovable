@@ -123,12 +123,14 @@ function ProductPage() {
     ? [...item.pics].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
     : [];
   const title = item.bizName ?? "Untitled";
-  const priceAttr = Array.isArray(item.attributes)
-    ? item.attributes.find(
-        (a: any) => String(a.title ?? a.name ?? a.key ?? "").toLowerCase() === "price"
-      )
-    : null;
+  const attrs: any[] = Array.isArray(item.attributes) ? item.attributes : [];
+  const getAttr = (name: string) =>
+    attrs.find((a: any) => String(a.title ?? a.name ?? a.key ?? "").toLowerCase() === name.toLowerCase());
+  const priceAttr = getAttr("price");
   const price = priceAttr?.value ?? priceAttr?.price;
+  const minQty = Math.max(1, Number(getAttr("minquantity")?.value ?? 1) || 1);
+  const maxQtyRaw = Number(getAttr("maxquantity")?.value);
+  const maxQty = Number.isFinite(maxQtyRaw) && maxQtyRaw > 0 ? maxQtyRaw : undefined;
   const desc = item.bizDesc ?? item.description;
   const categories: any[] = Array.isArray(item.categories) ? item.categories : [];
 
