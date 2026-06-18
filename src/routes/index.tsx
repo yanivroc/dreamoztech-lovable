@@ -128,14 +128,15 @@ function ItemCard({ item, country }: { item: any; country?: string | null }) {
     : null;
   const img = resolveImg(pic?.picThumbPath ?? pic?.picPath ?? item.image);
   const title = item.bizName ?? item.title ?? "Untitled";
-  const priceAttr = Array.isArray(item.attributes)
-    ? item.attributes.find(
-        (a: any) =>
-          String(a.title ?? a.name ?? a.key ?? "").toLowerCase() === "price"
-      )
-    : null;
+  const attrs: any[] = Array.isArray(item.attributes) ? item.attributes : [];
+  const getAttr = (name: string) =>
+    attrs.find((a) => String(a.title ?? a.name ?? a.key ?? "").toLowerCase() === name.toLowerCase());
+  const priceAttr = getAttr("price");
   const priceRaw = priceAttr?.value ?? priceAttr?.price;
   const priceNum = Number(priceRaw);
+  const minQty = Math.max(1, Number(getAttr("minquantity")?.value ?? 1) || 1);
+  const maxQtyRaw = Number(getAttr("maxquantity")?.value);
+  const maxQty = Number.isFinite(maxQtyRaw) && maxQtyRaw > 0 ? maxQtyRaw : undefined;
   const categories: any[] = Array.isArray(item.categories) ? item.categories : [];
   const slug = String(item.bizDisplayTitle ?? "");
   const id = String(item.id ?? slug);
@@ -147,7 +148,7 @@ function ItemCard({ item, country }: { item: any; country?: string | null }) {
       toast.error("Price unavailable");
       return;
     }
-    add({ id, slug, title, price: priceNum, image: img });
+    add({ id, slug, title, price: priceNum, image: img, minQty, maxQty }, minQty);
     toast.success(`${title} added to cart`);
     setOpen(true);
   }
