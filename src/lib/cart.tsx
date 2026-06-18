@@ -7,6 +7,8 @@ export type CartItem = {
   price: number;
   image?: string | null;
   qty: number;
+  minQty?: number;
+  maxQty?: number;
 };
 
 type CartCtx = {
@@ -56,13 +58,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
       add: (item, qty = 1) =>
         setItems((prev) => {
           const ex = prev.find((p) => p.id === item.id);
-          if (ex) return prev.map((p) => (p.id === item.id ? { ...p, qty: p.qty + qty } : p));
-          return [...prev, { ...item, qty }];
+          const max = item.maxQty ?? ex?.maxQty;
+          if (ex) {
+            const target = ex.qty + qty;
+            const capped = max != null ? Math.min(target, max) : target;
+            if (capped === ex.qty) return prev;
+            return prev.map((p) => (p.id === item.id ? { ...p, qty: capped, minQty: item.minQty ?? p.minQty, maxQty: max } : p));
+          }
+          const initial = max != null ? Math.min(Math.max(qty, item.minQty ?? 1), max) : Math.max(qty, item.minQty ?? 1);
+          return [...prev, { ...item, qty: initial }];
         }),
       remove: (id) => setItems((p) => p.filter((i) => i.id !== id)),
       setQty: (id, qty) =>
         setItems((p) =>
-          qty <= 0 ? p.filter((i) => i.id !== id) : p.map((i) => (i.id === id ? { ...i, qty } : i)),
+          p.flatMap((i) => {
+            if (i.id !== id) return [i];
+            if (qty <= 0) return [];
+            const min = i.minQty ?? 1;
+            const max = i.maxQty;
+            const next = Math.max(min, max != null ? Math.min(qty, max) : qty);
+            return [{ ...i, qty: next }];
+          }),
         ),
       clear: () => setItems([]),
     };

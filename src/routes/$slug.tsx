@@ -123,12 +123,14 @@ function ProductPage() {
     ? [...item.pics].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
     : [];
   const title = item.bizName ?? "Untitled";
-  const priceAttr = Array.isArray(item.attributes)
-    ? item.attributes.find(
-        (a: any) => String(a.title ?? a.name ?? a.key ?? "").toLowerCase() === "price"
-      )
-    : null;
+  const attrs: any[] = Array.isArray(item.attributes) ? item.attributes : [];
+  const getAttr = (name: string) =>
+    attrs.find((a: any) => String(a.title ?? a.name ?? a.key ?? "").toLowerCase() === name.toLowerCase());
+  const priceAttr = getAttr("price");
   const price = priceAttr?.value ?? priceAttr?.price;
+  const minQty = Math.max(1, Number(getAttr("minquantity")?.value ?? 1) || 1);
+  const maxQtyRaw = Number(getAttr("maxquantity")?.value);
+  const maxQty = Number.isFinite(maxQtyRaw) && maxQtyRaw > 0 ? maxQtyRaw : undefined;
   const desc = item.bizDesc ?? item.description;
   const categories: any[] = Array.isArray(item.categories) ? item.categories : [];
 
@@ -166,6 +168,8 @@ function ProductPage() {
                 title={title}
                 price={Number(price)}
                 image={resolveImg(pics[0]?.picThumbPath ?? pics[0]?.picPath) ?? undefined}
+                minQty={minQty}
+                maxQty={maxQty}
               />
             </div>
           )}
@@ -195,15 +199,15 @@ function ProductPage() {
 }
 
 function AddToCartButton({
-  id, slug, title, price, image,
-}: { id: string; slug: string; title: string; price: number; image?: string }) {
+  id, slug, title, price, image, minQty = 1, maxQty,
+}: { id: string; slug: string; title: string; price: number; image?: string; minQty?: number; maxQty?: number }) {
   const { add, setOpen } = useCart();
   function handle() {
     if (!isFinite(price) || price <= 0) {
       toast.error("Price unavailable");
       return;
     }
-    add({ id, slug, title, price, image });
+    add({ id, slug, title, price, image, minQty, maxQty }, minQty);
     toast.success(`${title} added to cart`);
     setOpen(true);
   }

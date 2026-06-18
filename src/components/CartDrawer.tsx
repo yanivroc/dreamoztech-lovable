@@ -34,19 +34,24 @@ export function CartDrawer({ country }: { country?: string | null }) {
                   <div className="flex items-center gap-2 mt-2">
                     <button
                       onClick={() => setQty(i.id, i.qty - 1)}
-                      className="h-7 w-7 inline-flex items-center justify-center rounded border hover:bg-accent"
+                      className="h-7 w-7 inline-flex items-center justify-center rounded border hover:bg-accent disabled:opacity-40"
                       aria-label="Decrease"
+                      disabled={i.qty <= (i.minQty ?? 1)}
                     >
                       <Minus className="h-3 w-3" />
                     </button>
                     <span className="text-sm w-6 text-center">{i.qty}</span>
                     <button
                       onClick={() => setQty(i.id, i.qty + 1)}
-                      className="h-7 w-7 inline-flex items-center justify-center rounded border hover:bg-accent"
+                      className="h-7 w-7 inline-flex items-center justify-center rounded border hover:bg-accent disabled:opacity-40"
                       aria-label="Increase"
+                      disabled={i.maxQty != null && i.qty >= i.maxQty}
                     >
                       <Plus className="h-3 w-3" />
                     </button>
+                    {i.maxQty != null && i.qty >= i.maxQty && (
+                      <span className="text-[10px] text-muted-foreground ml-1">Max {i.maxQty}</span>
+                    )}
                     <button
                       onClick={() => remove(i.id)}
                       className="ml-auto h-7 w-7 inline-flex items-center justify-center rounded text-destructive hover:bg-destructive/10"
