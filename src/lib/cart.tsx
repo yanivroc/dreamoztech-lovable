@@ -73,10 +73,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setItems((p) =>
           p.flatMap((i) => {
             if (i.id !== id) return [i];
+            if (qty <= 0) return [];
             const min = i.minQty ?? 1;
-            if (qty < min) return [];
-            const capped = i.maxQty != null ? Math.min(qty, i.maxQty) : qty;
-            return [{ ...i, qty: capped }];
+            const max = i.maxQty;
+            const next = Math.max(min, max != null ? Math.min(qty, max) : qty);
+            return [{ ...i, qty: next }];
           }),
         ),
       clear: () => setItems([]),
