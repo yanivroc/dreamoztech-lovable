@@ -199,15 +199,15 @@ function ProductPage() {
 }
 
 function AddToCartButton({
-  id, slug, title, price, image,
-}: { id: string; slug: string; title: string; price: number; image?: string }) {
+  id, slug, title, price, image, minQty = 1, maxQty,
+}: { id: string; slug: string; title: string; price: number; image?: string; minQty?: number; maxQty?: number }) {
   const { add, setOpen } = useCart();
   function handle() {
     if (!isFinite(price) || price <= 0) {
       toast.error("Price unavailable");
       return;
     }
-    add({ id, slug, title, price, image });
+    add({ id, slug, title, price, image, minQty, maxQty }, minQty);
     toast.success(`${title} added to cart`);
     setOpen(true);
   }
