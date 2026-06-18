@@ -168,6 +168,8 @@ function ProductPage() {
                 title={title}
                 price={Number(price)}
                 image={resolveImg(pics[0]?.picThumbPath ?? pics[0]?.picPath) ?? undefined}
+                minQty={minQty}
+                maxQty={maxQty}
               />
             </div>
           )}
