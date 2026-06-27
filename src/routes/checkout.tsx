@@ -3,6 +3,7 @@ import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { getDreamozData } from "@/lib/dreamoz.functions";
 import { getSquarePublicConfig, createSquarePayment } from "@/lib/square.functions";
+import { sendOrderEmails } from "@/lib/order-email.functions";
 import { SiteHeader, SiteFooter } from "@/components/SiteChrome";
 import { useCart, DELIVERY_FEE } from "@/lib/cart";
 import { currencyForCountry, formatPrice } from "@/lib/currency";
@@ -149,6 +150,29 @@ function CheckoutPage() {
       });
       toast.success("Payment successful!");
       setDone({ id: payment.id, receiptUrl: payment.receiptUrl });
+      try {
+        await sendOrderEmails({
+          data: {
+            orderId: payment.id ?? `ORD-${Date.now()}`,
+            receiptUrl: payment.receiptUrl ?? null,
+            currency,
+            subtotal,
+            deliveryFee: DELIVERY_FEE,
+            total,
+            buyer: {
+              name: form.name,
+              email: form.email,
+              phone: form.phone,
+              address: form.address,
+              city: form.city,
+              postcode: form.postcode,
+            },
+            items: items.map((i) => ({ title: i.title, qty: i.qty, price: i.price })),
+          },
+        });
+      } catch (err) {
+        console.error("Order email failed", err);
+      }
       clear();
     } catch (e: any) {
       toast.error(e?.message ?? "Payment failed");
