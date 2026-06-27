@@ -150,6 +150,29 @@ function CheckoutPage() {
       });
       toast.success("Payment successful!");
       setDone({ id: payment.id, receiptUrl: payment.receiptUrl });
+      try {
+        await sendOrderEmails({
+          data: {
+            orderId: payment.id ?? `ORD-${Date.now()}`,
+            receiptUrl: payment.receiptUrl ?? null,
+            currency,
+            subtotal,
+            deliveryFee: DELIVERY_FEE,
+            total,
+            buyer: {
+              name: form.name,
+              email: form.email,
+              phone: form.phone,
+              address: form.address,
+              city: form.city,
+              postcode: form.postcode,
+            },
+            items: items.map((i) => ({ title: i.title, qty: i.qty, price: i.price })),
+          },
+        });
+      } catch (err) {
+        console.error("Order email failed", err);
+      }
       clear();
     } catch (e: any) {
       toast.error(e?.message ?? "Payment failed");
