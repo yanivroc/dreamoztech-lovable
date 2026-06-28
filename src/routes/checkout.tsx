@@ -232,6 +232,7 @@ function CheckoutPage() {
                       }))
                     }
                     required
+                    country={countryIso2}
                   />
                   <p className="text-[10px] text-muted-foreground mt-1">Powered by Google Maps</p>
                 </div>
