@@ -81,29 +81,39 @@ export const sendOrderEmails = createServerFn({ method: "POST" })
   <strong>Address:</strong> ${esc(data.buyer.address)}${data.buyer.city ? ", " + esc(data.buyer.city) : ""}${data.buyer.postcode ? " " + esc(data.buyer.postcode) : ""}
 </p>`;
 
-    const receiptLink = data.receiptUrl
-      ? `<p><a href="${esc(data.receiptUrl)}" style="color:#2563eb;">View payment receipt</a></p>`
-      : "";
-
-    const nodemailer = await import("nodemailer");
-    const transporter = nodemailer.createTransport({
-      host: BREVO_EMAIL_CONFIG.smtpServer,
-      port: BREVO_EMAIL_CONFIG.port,
-      secure: false,
-      auth: { user: BREVO_EMAIL_CONFIG.login, pass: BREVO_EMAIL_CONFIG.password },
+    const orderDate = new Date().toLocaleDateString("en-AU", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
 
-    const from = `"${brand}" <${BREVO_EMAIL_CONFIG.emailFrom}>`;
+    const invoiceHtml = `<!doctype html>
+<html><head><meta charset="utf-8"/><title>Invoice ${esc(data.orderId)}</title></head>
+<body style="font-family:Arial,sans-serif;color:#111;max-width:720px;margin:24px auto;padding:0 16px;">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #111;padding-bottom:16px;margin-bottom:24px;">
+    <div>
+      <h1 style="margin:0;font-size:28px;">INVOICE</h1>
+      <p style="margin:4px 0;color:#666;font-size:13px;">Invoice #: ${esc(data.orderId)}<br/>Date: ${orderDate}</p>
+    </div>
+    <div style="text-align:right;">
+      <strong>${esc(brand)}</strong><br/>
+      <span style="color:#666;font-size:13px;">${esc(BREVO_EMAIL_CONFIG.emailFrom)}</span>
+    </div>
+  </div>
+  <h3 style="margin:0 0 8px;">Bill To</h3>
+  ${buyerBlock}
+  <h3 style="margin:24px 0 8px;">Order Details</h3>
+  ${summary}
+  <p style="color:#666;font-size:12px;margin-top:32px;text-align:center;">Thank you for your business!</p>
+</body></html>`;
 
-    // 1) Customer confirmation
     const customerHtml = `
 <div style="font-family:Arial,sans-serif;color:#111;max-width:640px;margin:0 auto;">
   <h2 style="color:#111;">Thank you for your order, ${esc(data.buyer.name)}!</h2>
-  <p>We've received your order <strong>#${esc(data.orderId)}</strong> and it's being processed.</p>
+  <p>We've received your order <strong>#${esc(data.orderId)}</strong> and it's being processed. Your invoice is attached to this email.</p>
   ${summary}
   <h3 style="margin-top:24px;">Delivery details</h3>
   ${buyerBlock}
-  ${receiptLink}
   <p style="color:#666;font-size:12px;margin-top:24px;">If you have any questions, reply to this email.</p>
   <p style="color:#666;font-size:12px;">— ${esc(brand)}</p>
 </div>`;
@@ -115,8 +125,13 @@ export const sendOrderEmails = createServerFn({ method: "POST" })
   ${summary}
   <h3 style="margin-top:24px;">Customer</h3>
   ${buyerBlock}
-  ${receiptLink}
 </div>`;
+
+    const invoiceAttachment = {
+      filename: `invoice-${data.orderId}.html`,
+      content: invoiceHtml,
+      contentType: "text/html",
+    };
 
     await Promise.all([
       transporter.sendMail({
@@ -124,6 +139,7 @@ export const sendOrderEmails = createServerFn({ method: "POST" })
         to: data.buyer.email,
         subject: `Order Confirmation #${data.orderId} - ${brand}`,
         html: customerHtml,
+        attachments: [invoiceAttachment],
       }),
       transporter.sendMail({
         from,
@@ -131,6 +147,7 @@ export const sendOrderEmails = createServerFn({ method: "POST" })
         replyTo: data.buyer.email,
         subject: `New Order #${data.orderId} - ${fmt(data.total, cur)}`,
         html: ownerHtml,
+        attachments: [invoiceAttachment],
       }),
     ]);
 
