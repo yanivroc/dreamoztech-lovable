@@ -67,6 +67,7 @@ function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
   const navigate = useNavigate();
   const country = member?.country;
+  const countryIso2 = iso2ForCountry(country);
   const currency = currencyForCountry(country);
   const total = subtotal + (items.length > 0 ? DELIVERY_FEE : 0);
 
