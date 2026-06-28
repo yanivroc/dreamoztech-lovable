@@ -36,8 +36,10 @@ const fmt = (n: number, cur: string) =>
 export const sendOrderEmails = createServerFn({ method: "POST" })
   .inputValidator((d) => schema.parse(d))
   .handler(async ({ data }) => {
-    const { BREVO_EMAIL_CONFIG, sendBrevoEmail, toBase64 } = await import("./brevo.server");
+    const { BREVO_EMAIL_CONFIG, sendBrevoEmail } = await import("./brevo.server");
     const { dreamozGet } = await import("./dreamoz.server");
+    const { buildInvoicePdfBase64 } = await import("./invoice-pdf.server");
+
 
     const memberResp = await dreamozGet("/Member/Get");
     const member = memberResp?.member ?? memberResp;
@@ -127,9 +129,21 @@ export const sendOrderEmails = createServerFn({ method: "POST" })
   ${buyerBlock}
 </div>`;
 
+    const pdfBase64 = await buildInvoicePdfBase64({
+      orderId: data.orderId,
+      brand,
+      brandEmail: BREVO_EMAIL_CONFIG.emailFrom,
+      currency: cur,
+      subtotal: data.subtotal,
+      deliveryFee: data.deliveryFee,
+      total: data.total,
+      buyer: data.buyer,
+      items: data.items,
+    });
     const invoiceAttachment = [
-      { name: `invoice-${data.orderId}.html`, content: toBase64(invoiceHtml) },
+      { name: `invoice-${data.orderId}.pdf`, content: pdfBase64 },
     ];
+
     const from = { email: BREVO_EMAIL_CONFIG.emailFrom, name: brand };
 
     await Promise.all([
