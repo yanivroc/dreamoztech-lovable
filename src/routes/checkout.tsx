@@ -217,6 +217,23 @@ function CheckoutPage() {
                 <Field label="Phone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
                 <Field label="Postcode" value={form.postcode} onChange={(v) => setForm({ ...form, postcode: v })} />
                 <div className="sm:col-span-2">
+                  <Label className="mb-1 block text-xs">Address *</Label>
+                  <AddressAutocomplete
+                    value={form.address}
+                    onChange={(v) => setForm((f) => ({ ...f, address: v }))}
+                    onSelect={(p) =>
+                      setForm((f) => ({
+                        ...f,
+                        address: p.address,
+                        city: p.city || f.city,
+                        postcode: p.postcode || f.postcode,
+                      }))
+                    }
+                    required
+                  />
+                  <p className="text-[10px] text-muted-foreground mt-1">Powered by Google Maps</p>
+                </div>
+                <div className="sm:col-span-2">
                   <Field label="Address" value={form.address} onChange={(v) => setForm({ ...form, address: v })} required />
                 </div>
                 <Field label="City" value={form.city} onChange={(v) => setForm({ ...form, city: v })} />
