@@ -5,6 +5,7 @@ import { getDreamozData } from "@/lib/dreamoz.functions";
 import { getSquarePublicConfig, createSquarePayment } from "@/lib/square.functions";
 import { sendOrderEmails } from "@/lib/order-email.functions";
 import { SiteHeader, SiteFooter } from "@/components/SiteChrome";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { useCart, DELIVERY_FEE } from "@/lib/cart";
 import { currencyForCountry, formatPrice } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
