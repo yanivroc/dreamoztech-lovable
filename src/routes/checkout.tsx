@@ -7,7 +7,7 @@ import { sendOrderEmails } from "@/lib/order-email.functions";
 import { SiteHeader, SiteFooter } from "@/components/SiteChrome";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { useCart, DELIVERY_FEE } from "@/lib/cart";
-import { currencyForCountry, formatPrice } from "@/lib/currency";
+import { currencyForCountry, formatPrice, iso2ForCountry } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
