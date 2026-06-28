@@ -85,7 +85,7 @@ export function AddressAutocomplete({
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [country]);
 
   return (
     <Input
