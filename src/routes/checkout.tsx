@@ -190,20 +190,14 @@ function CheckoutPage() {
 
         {done ? (
           <div className="rounded-xl border bg-card p-8 shadow-sm text-center space-y-4">
-            <h2 className="text-xl font-semibold text-primary">Payment Successful</h2>
+            <h2 className="text-xl font-semibold text-primary">Order Successful</h2>
+            <p className="text-muted-foreground">
+              Thank you! Your order has been placed successfully. You will receive
+              a confirmation email with your invoice shortly.
+            </p>
             <p className="text-muted-foreground text-sm">
               Order ID: <span className="font-mono">{done.id}</span>
             </p>
-            {done.receiptUrl && (
-              <a
-                href={done.receiptUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-block text-primary underline"
-              >
-                View receipt
-              </a>
-            )}
             <div>
               <Button onClick={() => navigate({ to: "/" })}>Back to home</Button>
             </div>
