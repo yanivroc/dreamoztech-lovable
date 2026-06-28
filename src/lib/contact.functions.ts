@@ -18,7 +18,7 @@ export const sendContactEmail = createServerFn({ method: "POST" })
       throw new Error("Captcha verification failed. Please try again.");
     }
 
-    const { BREVO_EMAIL_CONFIG } = await import("./brevo.server");
+    const { BREVO_EMAIL_CONFIG, sendBrevoEmail } = await import("./brevo.server");
     const { dreamozGet } = await import("./dreamoz.server");
 
     const memberResp = await dreamozGet("/Member/Get");
@@ -26,29 +26,18 @@ export const sendContactEmail = createServerFn({ method: "POST" })
     const toEmail =
       member?.memberEmail ?? member?.email ?? "support@dreamoztech.com";
 
-    const nodemailer = await import("nodemailer");
-    const transporter = nodemailer.createTransport({
-      host: BREVO_EMAIL_CONFIG.smtpServer,
-      port: BREVO_EMAIL_CONFIG.port,
-      secure: false,
-      auth: {
-        user: BREVO_EMAIL_CONFIG.login,
-        pass: BREVO_EMAIL_CONFIG.password,
-      },
-    });
-
     const safe = (s: string) =>
       s.replace(/[&<>"']/g, (c) =>
         ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!)
       );
 
-    await transporter.sendMail({
-      from: `"${safe(data.name)} via DreamozTech" <${BREVO_EMAIL_CONFIG.emailFrom}>`,
-      to: toEmail,
-      replyTo: data.email,
+    await sendBrevoEmail({
+      from: { email: BREVO_EMAIL_CONFIG.emailFrom, name: `${data.name} via DreamozTech` },
+      to: [{ email: toEmail }],
+      replyTo: { email: data.email, name: data.name },
       subject: `[Contact] ${data.subject}`,
-      text: `Name: ${data.name}\nEmail: ${data.email}\n\n${data.message}`,
-      html: `<p><strong>Name:</strong> ${safe(data.name)}<br/>
+      textContent: `Name: ${data.name}\nEmail: ${data.email}\n\n${data.message}`,
+      htmlContent: `<p><strong>Name:</strong> ${safe(data.name)}<br/>
 <strong>Email:</strong> ${safe(data.email)}</p>
 <p><strong>Subject:</strong> ${safe(data.subject)}</p>
 <p>${safe(data.message).replace(/\n/g, "<br/>")}</p>`,

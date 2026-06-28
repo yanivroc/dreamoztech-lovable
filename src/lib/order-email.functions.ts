@@ -36,7 +36,7 @@ const fmt = (n: number, cur: string) =>
 export const sendOrderEmails = createServerFn({ method: "POST" })
   .inputValidator((d) => schema.parse(d))
   .handler(async ({ data }) => {
-    const { BREVO_EMAIL_CONFIG } = await import("./brevo.server");
+    const { BREVO_EMAIL_CONFIG, sendBrevoEmail, toBase64 } = await import("./brevo.server");
     const { dreamozGet } = await import("./dreamoz.server");
 
     const memberResp = await dreamozGet("/Member/Get");
@@ -127,36 +127,26 @@ export const sendOrderEmails = createServerFn({ method: "POST" })
   ${buyerBlock}
 </div>`;
 
-    const invoiceAttachment = {
-      filename: `invoice-${data.orderId}.html`,
-      content: invoiceHtml,
-      contentType: "text/html",
-    };
-
-    const nodemailer = await import("nodemailer");
-    const transporter = nodemailer.createTransport({
-      host: BREVO_EMAIL_CONFIG.smtpServer,
-      port: BREVO_EMAIL_CONFIG.port,
-      secure: false,
-      auth: { user: BREVO_EMAIL_CONFIG.login, pass: BREVO_EMAIL_CONFIG.password },
-    });
-    const from = `"${brand}" <${BREVO_EMAIL_CONFIG.emailFrom}>`;
+    const invoiceAttachment = [
+      { name: `invoice-${data.orderId}.html`, content: toBase64(invoiceHtml) },
+    ];
+    const from = { email: BREVO_EMAIL_CONFIG.emailFrom, name: brand };
 
     await Promise.all([
-      transporter.sendMail({
+      sendBrevoEmail({
         from,
-        to: data.buyer.email,
+        to: [{ email: data.buyer.email, name: data.buyer.name }],
         subject: `Order Confirmation #${data.orderId} - ${brand}`,
-        html: customerHtml,
-        attachments: [invoiceAttachment],
+        htmlContent: customerHtml,
+        attachment: invoiceAttachment,
       }),
-      transporter.sendMail({
+      sendBrevoEmail({
         from,
-        to: ownerEmail,
-        replyTo: data.buyer.email,
+        to: [{ email: ownerEmail }],
+        replyTo: { email: data.buyer.email, name: data.buyer.name },
         subject: `New Order #${data.orderId} - ${fmt(data.total, cur)}`,
-        html: ownerHtml,
-        attachments: [invoiceAttachment],
+        htmlContent: ownerHtml,
+        attachment: invoiceAttachment,
       }),
     ]);
 
