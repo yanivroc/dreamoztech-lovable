@@ -233,9 +233,6 @@ function CheckoutPage() {
                   />
                   <p className="text-[10px] text-muted-foreground mt-1">Powered by Google Maps</p>
                 </div>
-                <div className="sm:col-span-2">
-                  <Field label="Address" value={form.address} onChange={(v) => setForm({ ...form, address: v })} required />
-                </div>
                 <Field label="City" value={form.city} onChange={(v) => setForm({ ...form, city: v })} />
               </div>
 
