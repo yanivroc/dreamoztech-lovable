@@ -5,6 +5,7 @@ import { getDreamozData } from "@/lib/dreamoz.functions";
 import { getSquarePublicConfig, createSquarePayment } from "@/lib/square.functions";
 import { sendOrderEmails } from "@/lib/order-email.functions";
 import { SiteHeader, SiteFooter } from "@/components/SiteChrome";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { useCart, DELIVERY_FEE } from "@/lib/cart";
 import { currencyForCountry, formatPrice } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
@@ -190,20 +191,14 @@ function CheckoutPage() {
 
         {done ? (
           <div className="rounded-xl border bg-card p-8 shadow-sm text-center space-y-4">
-            <h2 className="text-xl font-semibold text-primary">Payment Successful</h2>
+            <h2 className="text-xl font-semibold text-primary">Order Successful</h2>
+            <p className="text-muted-foreground">
+              Thank you! Your order has been placed successfully. You will receive
+              a confirmation email with your invoice shortly.
+            </p>
             <p className="text-muted-foreground text-sm">
               Order ID: <span className="font-mono">{done.id}</span>
             </p>
-            {done.receiptUrl && (
-              <a
-                href={done.receiptUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-block text-primary underline"
-              >
-                View receipt
-              </a>
-            )}
             <div>
               <Button onClick={() => navigate({ to: "/" })}>Back to home</Button>
             </div>
@@ -223,7 +218,21 @@ function CheckoutPage() {
                 <Field label="Phone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
                 <Field label="Postcode" value={form.postcode} onChange={(v) => setForm({ ...form, postcode: v })} />
                 <div className="sm:col-span-2">
-                  <Field label="Address" value={form.address} onChange={(v) => setForm({ ...form, address: v })} required />
+                  <Label className="mb-1 block text-xs">Address *</Label>
+                  <AddressAutocomplete
+                    value={form.address}
+                    onChange={(v) => setForm((f) => ({ ...f, address: v }))}
+                    onSelect={(p) =>
+                      setForm((f) => ({
+                        ...f,
+                        address: p.address,
+                        city: p.city || f.city,
+                        postcode: p.postcode || f.postcode,
+                      }))
+                    }
+                    required
+                  />
+                  <p className="text-[10px] text-muted-foreground mt-1">Powered by Google Maps</p>
                 </div>
                 <Field label="City" value={form.city} onChange={(v) => setForm({ ...form, city: v })} />
               </div>
