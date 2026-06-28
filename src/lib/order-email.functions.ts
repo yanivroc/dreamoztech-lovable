@@ -133,6 +133,15 @@ export const sendOrderEmails = createServerFn({ method: "POST" })
       contentType: "text/html",
     };
 
+    const nodemailer = await import("nodemailer");
+    const transporter = nodemailer.createTransport({
+      host: BREVO_EMAIL_CONFIG.smtpServer,
+      port: BREVO_EMAIL_CONFIG.port,
+      secure: false,
+      auth: { user: BREVO_EMAIL_CONFIG.login, pass: BREVO_EMAIL_CONFIG.password },
+    });
+    const from = `"${brand}" <${BREVO_EMAIL_CONFIG.emailFrom}>`;
+
     await Promise.all([
       transporter.sendMail({
         from,
