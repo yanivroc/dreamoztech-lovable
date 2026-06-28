@@ -36,8 +36,10 @@ const fmt = (n: number, cur: string) =>
 export const sendOrderEmails = createServerFn({ method: "POST" })
   .inputValidator((d) => schema.parse(d))
   .handler(async ({ data }) => {
-    const { BREVO_EMAIL_CONFIG, sendBrevoEmail, toBase64 } = await import("./brevo.server");
+    const { BREVO_EMAIL_CONFIG, sendBrevoEmail } = await import("./brevo.server");
     const { dreamozGet } = await import("./dreamoz.server");
+    const { buildInvoicePdfBase64 } = await import("./invoice-pdf.server");
+
 
     const memberResp = await dreamozGet("/Member/Get");
     const member = memberResp?.member ?? memberResp;
