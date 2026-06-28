@@ -39,12 +39,14 @@ export function AddressAutocomplete({
   onSelect,
   required,
   placeholder = "Start typing your address",
+  country = "au",
 }: {
   value: string;
   onChange: (v: string) => void;
   onSelect?: (parts: Parts) => void;
   required?: boolean;
   placeholder?: string;
+  country?: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const acRef = useRef<any>(null);
@@ -57,7 +59,7 @@ export function AddressAutocomplete({
         const ac = new window.google.maps.places.Autocomplete(inputRef.current, {
           types: ["address"],
           fields: ["address_components", "formatted_address"],
-          componentRestrictions: { country: ["au"] },
+          componentRestrictions: { country: [country.toLowerCase()] },
         });
         acRef.current = ac;
         ac.addListener("place_changed", () => {
@@ -83,7 +85,7 @@ export function AddressAutocomplete({
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [country]);
 
   return (
     <Input

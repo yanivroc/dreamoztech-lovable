@@ -7,7 +7,7 @@ import { sendOrderEmails } from "@/lib/order-email.functions";
 import { SiteHeader, SiteFooter } from "@/components/SiteChrome";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { useCart, DELIVERY_FEE } from "@/lib/cart";
-import { currencyForCountry, formatPrice } from "@/lib/currency";
+import { currencyForCountry, formatPrice, iso2ForCountry } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -67,6 +67,7 @@ function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
   const navigate = useNavigate();
   const country = member?.country;
+  const countryIso2 = iso2ForCountry(country);
   const currency = currencyForCountry(country);
   const total = subtotal + (items.length > 0 ? DELIVERY_FEE : 0);
 
@@ -231,6 +232,7 @@ function CheckoutPage() {
                       }))
                     }
                     required
+                    country={countryIso2}
                   />
                   <p className="text-[10px] text-muted-foreground mt-1">Powered by Google Maps</p>
                 </div>
