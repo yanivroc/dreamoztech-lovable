@@ -155,7 +155,7 @@ function CheckoutPage() {
       try {
         await sendOrderEmails({
           data: {
-            orderId: payment.id ?? `ORD-${Date.now()}`,
+            orderId: buildOrderId(form.name),
             receiptUrl: payment.receiptUrl ?? null,
             currency,
             subtotal,
