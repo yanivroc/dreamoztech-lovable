@@ -14,6 +14,34 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 const dataQuery = queryOptions({ queryKey: ["dreamoz"], queryFn: () => getDreamozData() });
+
+// Build a friendly order id: "firstname-DDMMYYHHmm" in Sydney time.
+// Example: richard-2906261018
+function buildOrderId(fullName: string): string {
+  const first = (fullName || "order")
+    .trim()
+    .split(/\s+/)[0]
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "")
+    .slice(0, 20) || "order";
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Australia/Sydney",
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  })
+    .formatToParts(new Date())
+    .reduce<Record<string, string>>((acc, p) => {
+      if (p.type !== "literal") acc[p.type] = p.value;
+      return acc;
+    }, {});
+  const stamp = `${parts.day}${parts.month}${parts.year}${parts.hour}${parts.minute}`;
+  return `${first}-${stamp}`;
+}
+
 const squareCfgQuery = queryOptions({
   queryKey: ["square-config"],
   queryFn: () => getSquarePublicConfig(),
