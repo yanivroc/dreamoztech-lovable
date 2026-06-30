@@ -122,32 +122,34 @@ export async function buildInvoicePdfBase64(data: InvoiceData): Promise<string> 
   };
 
   for (const it of data.items) {
+    const rowTop = y;
     const lines = wrap(it.title, colQty - colItem - 12, 10);
     const rowHeight = Math.max(16, lines.length * 12 + 4);
-    let ly = y;
+    let ly = rowTop;
     for (const l of lines) {
       page.drawText(l, { x: colItem + 6, y: ly, size: 10, font, color: black });
       ly -= 12;
     }
-    page.drawText(String(it.qty), { x: colQty, y, size: 10, font, color: black });
+    page.drawText(String(it.qty), { x: colQty, y: rowTop, size: 10, font, color: black });
     const priceText = fmt(it.qty * it.price, cur);
     page.drawText(priceText, {
       x: colPrice - font.widthOfTextAtSize(priceText, 10),
-      y,
+      y: rowTop,
       size: 10,
       font,
       color: black,
     });
-    y -= rowHeight;
+    y = rowTop - rowHeight;
     page.drawLine({
-      start: { x: margin, y: y + 4 },
-      end: { x: 595 - margin, y: y + 4 },
+      start: { x: margin, y },
+      end: { x: 595 - margin, y },
       thickness: 0.5,
       color: line,
     });
+    y -= 10;
   }
 
-  y -= 10;
+  y -= 2;
   const row = (label: string, value: string, isBold = false) => {
     const f = isBold ? bold : font;
     page.drawText(label, {
