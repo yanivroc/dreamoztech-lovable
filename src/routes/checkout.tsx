@@ -154,13 +154,14 @@ function CheckoutPage() {
       return;
     }
     setPaying(true);
+    const orderId = buildOrderId(form.name);
     try {
       const result = await cardRef.current.tokenize();
       if (result.status !== "OK") {
         const msg = result.errors?.[0]?.message ?? "Card tokenization failed";
         throw new Error(msg);
       }
-      const note = items.map((i) => `${i.qty} x ${i.title}`).join(", ");
+      const note = `Order ${orderId}: ` + items.map((i) => `${i.qty} x ${i.title}`).join(", ");
       const payment = await createSquarePayment({
         data: {
           sourceId: result.token,
@@ -179,11 +180,11 @@ function CheckoutPage() {
         },
       });
       toast.success("Payment successful!");
-      setDone({ id: payment.id, receiptUrl: payment.receiptUrl });
+      setDone({ id: orderId, receiptUrl: payment.receiptUrl });
       try {
         await sendOrderEmails({
           data: {
-            orderId: buildOrderId(form.name),
+            orderId,
             receiptUrl: payment.receiptUrl ?? null,
             currency,
             subtotal,
