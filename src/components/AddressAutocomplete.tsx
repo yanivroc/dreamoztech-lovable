@@ -67,6 +67,7 @@ export function AddressAutocomplete({
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
+  const acRef = useRef<any>(null);
   const sessionTokenRef = useRef<any>(null);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,12 +84,20 @@ export function AddressAutocomplete({
     loadGooglePlaces()
       .then(() => {
         if (cancelled) return;
-        if (!window.google?.maps?.places?.AutocompleteSuggestion) {
+        const places = window.google?.maps?.places;
+        if (places?.AutocompleteSuggestion) {
+          sessionTokenRef.current = new places.AutocompleteSessionToken();
+          setReady(true);
+          return;
+        }
+        if (places?.Autocomplete && inputRef.current) {
+          attachLegacyAutocomplete(places.Autocomplete);
+          return;
+        }
+        {
           setError("Google Places is unavailable for this domain/API key.");
           return;
         }
-        sessionTokenRef.current = new window.google.maps.places.AutocompleteSessionToken();
-        setReady(true);
       })
       .catch((e) => {
         console.error("Google Places load failed", e);
@@ -120,6 +129,12 @@ export function AddressAutocomplete({
         setOpen((suggestions ?? []).length > 0);
       } catch (e) {
         console.error("Google Places suggestions failed", e);
+        const message = String((e as any)?.message ?? e ?? "");
+        const places = window.google?.maps?.places;
+        if (!message.toLowerCase().includes("blocked") && places?.Autocomplete && inputRef.current) {
+          attachLegacyAutocomplete(places.Autocomplete);
+          return;
+        }
         if (!cancelled) {
           setError("Google address lookup is blocked. Check API restrictions for this domain.");
           setSuggestions([]);
@@ -133,6 +148,29 @@ export function AddressAutocomplete({
       window.clearTimeout(timer);
     };
   }, [ready, regionCodes, value]);
+
+  function attachLegacyAutocomplete(Autocomplete: any) {
+    if (!inputRef.current || acRef.current) return;
+    const ac = new Autocomplete(inputRef.current, {
+      types: ["address"],
+      fields: ["address_components", "formatted_address"],
+      componentRestrictions: { country: [country.toLowerCase()] },
+    });
+    acRef.current = ac;
+    ac.addListener("place_changed", () => {
+      const place = ac.getPlace();
+      const comps: any[] = place.address_components ?? [];
+      const get = (t: string) => comps.find((c) => c.types.includes(t))?.long_name ?? "";
+      const streetNumber = get("street_number");
+      const route = get("route");
+      const city = get("locality") || get("postal_town") || get("administrative_area_level_2");
+      const postcode = get("postal_code");
+      const selectedCountry = comps.find((c) => c.types.includes("country"))?.short_name ?? "";
+      const address = place.formatted_address?.split(",")[0] || `${streetNumber} ${route}`.trim();
+      onChange(address);
+      onSelect?.({ address, city, postcode, country: selectedCountry });
+    });
+  }
 
   useEffect(() => {
     function onPointerDown(e: PointerEvent) {
