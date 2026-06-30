@@ -9,23 +9,28 @@ const GOOGLE_MAPS_CHANNEL = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_T
 declare global {
   interface Window {
     google?: any;
-    __googleMapsPlacesLoading?: Promise<void>;
+    __googleMapsPlacesLoading?: Promise<any>;
     __dreamozGoogleMapsReady?: () => void;
   }
 }
 
-function loadGooglePlaces(): Promise<void> {
+async function importPlacesLibrary() {
+  const places = await window.google?.maps?.importLibrary?.("places");
+  if (places) {
+    window.google.maps.places = { ...(window.google.maps.places ?? {}), ...places };
+  }
+  return places ?? window.google?.maps?.places;
+}
+
+function loadGooglePlaces(): Promise<any> {
   if (typeof window === "undefined") return Promise.reject(new Error("no window"));
   if (window.google?.maps?.importLibrary) {
-    return window.google.maps.importLibrary("places").then(() => undefined);
+    return importPlacesLibrary();
   }
   if (window.__googleMapsPlacesLoading) return window.__googleMapsPlacesLoading;
   window.__googleMapsPlacesLoading = new Promise((resolve, reject) => {
     window.__dreamozGoogleMapsReady = () => {
-      window.google?.maps
-        ?.importLibrary("places")
-        .then(() => resolve())
-        .catch(reject);
+      importPlacesLibrary().then(resolve).catch(reject);
     };
     const s = document.createElement("script");
     const params = new URLSearchParams({
@@ -68,6 +73,7 @@ export function AddressAutocomplete({
   const inputRef = useRef<HTMLInputElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const acRef = useRef<any>(null);
+  const placesRef = useRef<any>(null);
   const sessionTokenRef = useRef<any>(null);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -82,9 +88,10 @@ export function AddressAutocomplete({
   useEffect(() => {
     let cancelled = false;
     loadGooglePlaces()
-      .then(() => {
+      .then((placesLib) => {
         if (cancelled) return;
-        const places = window.google?.maps?.places;
+        const places = placesLib ?? window.google?.maps?.places;
+        placesRef.current = places;
         if (places?.AutocompleteSuggestion) {
           sessionTokenRef.current = new places.AutocompleteSessionToken();
           setReady(true);
@@ -118,8 +125,9 @@ export function AddressAutocomplete({
     let cancelled = false;
     const timer = window.setTimeout(async () => {
       try {
+        const places = placesRef.current ?? window.google?.maps?.places;
         const { suggestions } =
-          await window.google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
+          await places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
             input: value,
             includedRegionCodes: regionCodes,
             sessionToken: sessionTokenRef.current,
@@ -183,6 +191,7 @@ export function AddressAutocomplete({
   async function selectSuggestion(suggestion: any) {
     const prediction = suggestion.placePrediction;
     if (!prediction) return;
+    const suggestionText = prediction.text?.text ?? value;
     try {
       const place = prediction.toPlace();
       await place.fetchFields({ fields: ["formattedAddress", "addressComponents"] });
@@ -206,11 +215,15 @@ export function AddressAutocomplete({
       onSelect?.({ address, city, postcode, country: selectedCountry });
       setOpen(false);
       setSuggestions([]);
-      sessionTokenRef.current = new window.google.maps.places.AutocompleteSessionToken();
+      const places = placesRef.current ?? window.google?.maps?.places;
+      sessionTokenRef.current = places?.AutocompleteSessionToken
+        ? new places.AutocompleteSessionToken()
+        : sessionTokenRef.current;
     } catch (e) {
       console.error("Google Places detail failed", e);
-      const address = prediction.text?.text?.split(",")[0] ?? value;
-      onChange(address);
+      const parsed = parseAddressText(suggestionText);
+      onChange(parsed.address);
+      onSelect?.(parsed);
       setOpen(false);
     }
   }
@@ -251,4 +264,14 @@ export function AddressAutocomplete({
       {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
     </div>
   );
+}
+
+function parseAddressText(text: string): Parts {
+  const segments = text.split(",").map((s) => s.trim()).filter(Boolean);
+  const address = segments[0] || text;
+  const locality = segments[1] || "";
+  const postcodeMatch = text.match(/\b\d{4}\b/);
+  const city = locality.replace(/\b(?:ACT|NSW|NT|QLD|SA|TAS|VIC|WA)\b.*$/i, "").trim();
+  const country = /Australia/i.test(text) ? "AU" : undefined;
+  return { address, city, postcode: postcodeMatch?.[0], country };
 }
