@@ -176,7 +176,7 @@ export async function buildInvoicePdfBase64(data: InvoiceData): Promise<string> 
     thickness: 1.5,
     color: black,
   });
-  y -= 4;
+  y -= 12;
   row("Total", fmt(data.total, cur), true);
 
   y -= 30;
