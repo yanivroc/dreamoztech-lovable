@@ -184,7 +184,7 @@ function CheckoutPage() {
       try {
         await sendOrderEmails({
           data: {
-            orderId: buildOrderId(form.name),
+            orderId,
             receiptUrl: payment.receiptUrl ?? null,
             currency,
             subtotal,
