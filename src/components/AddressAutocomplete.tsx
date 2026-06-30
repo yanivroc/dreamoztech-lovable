@@ -54,8 +54,16 @@ export function AddressAutocomplete({
   useEffect(() => {
     let cancelled = false;
     loadGooglePlaces()
-      .then(() => {
-        if (cancelled || !inputRef.current || !window.google?.maps?.places) return;
+      .then(async () => {
+        if (cancelled || !inputRef.current) return;
+        // With loading=async, libraries must be imported explicitly.
+        if (window.google?.maps?.importLibrary) {
+          await window.google.maps.importLibrary("places");
+        }
+        if (cancelled || !window.google?.maps?.places?.Autocomplete) {
+          console.error("Google Places library unavailable");
+          return;
+        }
         const ac = new window.google.maps.places.Autocomplete(inputRef.current, {
           types: ["address"],
           fields: ["address_components", "formatted_address"],
