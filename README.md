@@ -2,7 +2,8 @@
 
 Welcome to the frontend companion app for **DreamozTech**! This project demonstrates how seamlessly you can use the DreamozTech free API to power a dynamic, content-driven website (including user profiles, blogs, and product listings) with a frontend built completely in Lovable.
 
-🔗 **Live Demo:** [https://dreamoztech.lovable.app/](https://dreamoztech.lovable.app/)  
+🔗 **Live Demo (Lovable):** [https://dreamoztech.lovable.app/](https://dreamoztech.lovable.app/)  
+🔗 **Live Demo (Vercel):** [https://dreamoztech-lovable.vercel.app/](https://dreamoztech-lovable.vercel.app/)  
 🔗 **Backend Platform:** [https://dreamoztech.com](https://dreamoztech.com)
 
 ---
