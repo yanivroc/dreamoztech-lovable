@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Facebook, Twitter, Instagram } from "lucide-react";
 import { CartButton } from "./CartButton";
 import { ThemeSwitcher } from "./ThemeSwitcher";
+import { LayoutSwitcher } from "./LayoutSwitcher";
 
 export function SiteHeader({ member }: { member: any }) {
   return (
@@ -26,6 +27,7 @@ export function SiteHeader({ member }: { member: any }) {
           <li><Link to="/" hash="products" className="hover:text-primary">Products</Link></li>
           <li><Link to="/" hash="contact" className="hover:text-primary">Contact</Link></li>
           <li><CartButton /></li>
+          <li><LayoutSwitcher /></li>
           <li><ThemeSwitcher /></li>
           {member?.facebookProfile && (
             <li>
