@@ -120,6 +120,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: LAYOUT_INIT_SCRIPT }} />
         <HeadContent />
       </head>
       <body>
@@ -136,11 +137,13 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <CartProvider>
-          <Outlet />
-          <CartDrawerMount />
-          <Toaster richColors position="top-right" />
-        </CartProvider>
+        <LayoutProvider>
+          <CartProvider>
+            <Outlet />
+            <CartDrawerMount />
+            <Toaster richColors position="top-right" />
+          </CartProvider>
+        </LayoutProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
