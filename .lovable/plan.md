@@ -1,32 +1,40 @@
-# Shopping Cart + Square Payments
+# Theme Switcher with 10+ Themes
 
 ## What you'll get
-- "Add to Cart" button on each product card and the product detail page.
-- A cart drawer (slide-out from the right) accessible from a cart icon in the navbar with a live item count badge.
-- Inside the cart: line items with image, title, qty +/- controls, remove button, subtotal, **flat $10 delivery fee**, and grand total — all shown in the member's currency (AUD).
-- A "Checkout" button that opens a checkout page asking for name, email, phone, and shipping address, then renders the **Square Web Payments SDK** card form (sandbox).
-- On submit: card is tokenized client-side by Square, token is sent to a server function which charges via the Square Payments API (sandbox) using your Access Token + Location ID, then shows a success screen and clears the cart.
-- Cart persists across reloads via `localStorage`.
+- A **theme dropdown** in the top-right of the site header (next to the cart icon) showing the current theme name with a small swatch and a chevron.
+- **12 curated themes**, each retheming the entire site (background, cards, nav, buttons, product cards, footer, cart drawer, checkout — everything using semantic tokens):
+  1. **Sunny** — warm cream + amber accents, bright and cheerful
+  2. **Paramount** — clean white + deep navy, corporate/premium
+  3. **Dark** — charcoal + soft white, comfortable dark mode
+  4. **Nightly** — near-black + electric indigo, sleek tech
+  5. **Starry** — deep midnight blue + gold accents
+  6. **Ocean** — light + deep teals and blues, calm
+  7. **Forest** — off-white + deep greens, natural
+  8. **Sunset** — warm peach + magenta/orange accents
+  9. **Noir** — pure black + white + single red accent, brutalist
+  10. **Rose** — blush pink + burgundy, elegant
+  11. **Mono** — pure grayscale, minimal editorial
+  12. **Cyber** — black + neon mint/cyan, futuristic
+- Selected theme **persists across reloads** (localStorage) and applies instantly with a smooth color transition.
+- Works site-wide because every component already uses semantic tokens (`bg-background`, `text-foreground`, `bg-primary`, etc.) — no per-component changes needed.
 
-## Where things live (technical)
-- **Secrets (stored server-side, not in code):** `SQUARE_ACCESS_TOKEN`, `SQUARE_LOCATION_ID`, `SQUARE_ENVIRONMENT=sandbox`.
-- **Public (safe in code, needed by browser SDK):** `SQUARE_APPLICATION_ID` and `SQUARE_LOCATION_ID` — exposed via a small server fn `getSquarePublicConfig()` so we don't hardcode.
-- `src/lib/cart.tsx` — `CartProvider` + `useCart()` hook (items, add/remove/updateQty/clear, totals). Persists to localStorage.
-- `src/components/CartDrawer.tsx` — slide-out drawer using shadcn `Sheet`.
-- `src/components/CartButton.tsx` — navbar icon with badge; added to `SiteHeader`.
-- `src/routes/checkout.tsx` — checkout page with address form + Square card form (loads `https://sandbox.web.squarecdn.com/v1/square.js`).
-- `src/lib/square.functions.ts` — `getSquarePublicConfig` (GET) and `createSquarePayment` (POST: takes nonce, amount cents, currency, buyer info; calls Square `/v2/payments`).
-- `src/lib/square.server.ts` — fetch wrapper for Square sandbox API.
-- Add to Cart wired into `src/routes/index.tsx` product cards and `src/routes/$slug.tsx` detail page.
-- `src/routes/__root.tsx` wraps app in `CartProvider`.
+## How it works (technical)
+- Add a `data-theme="sunny"` (etc.) attribute on `<html>`. Each theme is a CSS block in `src/styles.css` like `[data-theme="sunny"] { --background: ...; --primary: ...; ... }` overriding the same tokens `:root` already defines.
+- New `src/lib/theme.tsx` — `ThemeProvider` + `useTheme()` hook. Reads/writes `localStorage["site-theme"]`, sets `document.documentElement.dataset.theme`. Exports `THEMES` list `[{ id, name, swatch }]`.
+- New `src/components/ThemeSwitcher.tsx` — shadcn `DropdownMenu` trigger button (theme name + colored dot + chevron). Menu lists all 12 themes with a small swatch preview and a check next to the active one.
+- Wrap app in `<ThemeProvider>` inside `src/routes/__root.tsx` (inside `CartProvider`).
+- Add `<ThemeSwitcher />` to `src/components/SiteChrome.tsx` in the header `<ul>` before the `<CartButton />`.
+- Add a subtle `transition: background-color 200ms, color 200ms` on `body` so theme changes feel smooth.
+- SSR safety: initial `data-theme` is set via a tiny inline script injected in `__root.tsx` head (like next-themes) so there's no flash of wrong theme.
 
-## Flow
-1. User clicks "Add to Cart" → toast + badge updates.
-2. Opens drawer → reviews → "Checkout".
-3. `/checkout` shows address form + Square card input. Total = items + $10 delivery.
-4. On pay: Square SDK tokenizes card → POST to `createSquarePayment` server fn → Square charges in sandbox → success screen, cart cleared.
+## Not changing
+- No changes to product data, cart, checkout, Square, invoice, or email logic.
+- No changes to fonts or layout structure — only color tokens.
+- The existing `.dark` class still works; it's just superseded when a `data-theme` is set.
 
-## Notes
-- Sandbox test card: `4111 1111 1111 1111`, any future expiry, any CVV, any postcode.
-- Delivery flat $10 in the member's currency (AUD).
-- I'll add the 3 Square secrets via the secrets tool after you approve.
+## Files touched
+- `src/styles.css` — add 12 `[data-theme="..."]` blocks + body transition
+- `src/lib/theme.tsx` — new
+- `src/components/ThemeSwitcher.tsx` — new
+- `src/routes/__root.tsx` — wrap in ThemeProvider, inject no-flash script
+- `src/components/SiteChrome.tsx` — mount `<ThemeSwitcher />` in header
