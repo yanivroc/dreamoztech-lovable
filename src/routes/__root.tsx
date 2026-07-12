@@ -8,6 +8,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { CartProvider } from "@/lib/cart";
+import { ThemeProvider, THEME_INIT_SCRIPT } from "@/lib/theme";
 import { CartDrawer } from "@/components/CartDrawer";
 import { Toaster } from "@/components/ui/sonner";
 import { getDreamozData } from "@/lib/dreamoz.functions";
