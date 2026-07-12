@@ -132,8 +132,6 @@ function Index() {
               <CartButton />
               <StyleSwitcher />
             </div>
-
-            <ThemeSwitcher />
             <div className="flex gap-2 pt-2">
               {member?.facebookProfile && <a href={member.facebookProfile} target="_blank" rel="noreferrer"><Facebook className="h-4 w-4 text-muted-foreground hover:text-primary" /></a>}
               {member?.twitterProfile && <a href={member.twitterProfile} target="_blank" rel="noreferrer"><Twitter className="h-4 w-4 text-muted-foreground hover:text-primary" /></a>}
