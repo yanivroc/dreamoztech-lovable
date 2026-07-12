@@ -134,11 +134,13 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <CartProvider>
-        <Outlet />
-        <CartDrawerMount />
-        <Toaster richColors position="top-right" />
-      </CartProvider>
+      <ThemeProvider>
+        <CartProvider>
+          <Outlet />
+          <CartDrawerMount />
+          <Toaster richColors position="top-right" />
+        </CartProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
