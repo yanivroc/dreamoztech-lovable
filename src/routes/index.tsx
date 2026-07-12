@@ -9,8 +9,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useLayout } from "@/lib/layout-theme";
 import { CartButton } from "@/components/CartButton";
-import { ThemeSwitcher } from "@/components/ThemeSwitcher";
-import { LayoutSwitcher } from "@/components/LayoutSwitcher";
+import { StyleSwitcher } from "@/components/StyleSwitcher";
 import { Facebook, Twitter, Instagram, Home, ShoppingBag, Mail } from "lucide-react";
 
 const dataQuery = queryOptions({
@@ -131,8 +130,9 @@ function Index() {
           <div className="border-t p-3 space-y-2">
             <div className="flex items-center gap-2">
               <CartButton />
-              <LayoutSwitcher />
+              <StyleSwitcher />
             </div>
+
             <ThemeSwitcher />
             <div className="flex gap-2 pt-2">
               {member?.facebookProfile && <a href={member.facebookProfile} target="_blank" rel="noreferrer"><Facebook className="h-4 w-4 text-muted-foreground hover:text-primary" /></a>}
