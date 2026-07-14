@@ -2,7 +2,8 @@
 // Cloudflare Workers don't allow outbound SMTP, so we use Brevo's HTTP API.
 
 export const BREVO_EMAIL_CONFIG = {
-  emailFrom: "support@dreamoztech.com",
+  emailFrom: process.env.BREVO_FROM_EMAIL?.trim() || "support@dreamoztech.com",
+  fromName: process.env.BREVO_FROM_NAME?.trim() || "DreamozTech",
 };
 
 type Attachment = { name: string; content: string }; // content = base64
@@ -17,7 +18,9 @@ export async function sendBrevoEmail(opts: {
   attachment?: Attachment[];
 }) {
   const apiKey = process.env.BREVO_API_KEY;
-  if (!apiKey) throw new Error("BREVO_API_KEY is not configured");
+  if (!apiKey) {
+    throw new Error("BREVO_API_KEY is not configured. Add it in Vercel Environment Variables.");
+  }
 
   const res = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",

@@ -1,10 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 
-const GOOGLE_MAPS_KEY =
-  import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY ||
-  "AIzaSyCCZm8rWSRHkhIVNbcu1Low2__CmcGVWPg";
-const GOOGLE_MAPS_CHANNEL = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_TRACKING_ID;
+const GOOGLE_MAPS_KEY = import.meta.env.GOOGLE_MAPS_BROWSER_KEY?.trim() || "";
+const GOOGLE_MAPS_CHANNEL = import.meta.env.GOOGLE_MAPS_TRACKING_ID;
 
 declare global {
   interface Window {
@@ -28,6 +26,9 @@ function loadGooglePlaces(): Promise<any> {
     return importPlacesLibrary();
   }
   if (window.__googleMapsPlacesLoading) return window.__googleMapsPlacesLoading;
+  if (!GOOGLE_MAPS_KEY) {
+    return Promise.reject(new Error("Google Maps browser key is not configured"));
+  }
   window.__googleMapsPlacesLoading = new Promise((resolve, reject) => {
     window.__dreamozGoogleMapsReady = () => {
       importPlacesLibrary().then(resolve).catch(reject);

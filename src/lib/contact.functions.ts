@@ -32,7 +32,10 @@ export const sendContactEmail = createServerFn({ method: "POST" })
       );
 
     await sendBrevoEmail({
-      from: { email: BREVO_EMAIL_CONFIG.emailFrom, name: `${data.name} via DreamozTech` },
+      from: {
+        email: BREVO_EMAIL_CONFIG.emailFrom,
+        name: `${data.name} via ${BREVO_EMAIL_CONFIG.fromName}`,
+      },
       to: [{ email: toEmail }],
       replyTo: { email: data.email, name: data.name },
       subject: `[Contact] ${data.subject}`,

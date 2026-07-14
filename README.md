@@ -44,6 +44,17 @@ To ensure a smooth setup, **you must configure your content backend first** befo
    VITE_DREAMOZTECH_API_KEY="your_api_key_here"
 ```
 
+### Step 4: Configure Email Delivery (Vercel)
+Email notifications for contact forms and orders are sent through Brevo. After deployment to Vercel, add these environment variables in your Vercel project settings:
+```env
+BREVO_API_KEY="your_brevo_api_key"
+BREVO_FROM_EMAIL="support@yourdomain.com"
+BREVO_FROM_NAME="Your Business Name"
+```
+
+- `BREVO_API_KEY` is required.
+- `BREVO_FROM_EMAIL` and `BREVO_FROM_NAME` are optional, but recommended so the sender address is not hard-coded.
+
 ---
 
 ## 🌐 Connecting a Custom Domain
