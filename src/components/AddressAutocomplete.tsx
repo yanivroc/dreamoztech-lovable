@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { getGoogleMapsConfig } from "@/lib/google-maps.functions";
 
-const GOOGLE_MAPS_KEY = import.meta.env.GOOGLE_MAPS_BROWSER_KEY?.trim() || "";
-const GOOGLE_MAPS_CHANNEL = import.meta.env.GOOGLE_MAPS_TRACKING_ID;
+let GOOGLE_MAPS_KEY = "";
+let GOOGLE_MAPS_CHANNEL = "";
 
 declare global {
   interface Window {
@@ -20,12 +21,17 @@ async function importPlacesLibrary() {
   return places ?? window.google?.maps?.places;
 }
 
-function loadGooglePlaces(): Promise<any> {
+async function loadGooglePlaces(): Promise<any> {
   if (typeof window === "undefined") return Promise.reject(new Error("no window"));
   if (window.google?.maps?.importLibrary) {
     return importPlacesLibrary();
   }
   if (window.__googleMapsPlacesLoading) return window.__googleMapsPlacesLoading;
+  if (!GOOGLE_MAPS_KEY) {
+    const cfg = await getGoogleMapsConfig();
+    GOOGLE_MAPS_KEY = cfg.browserKey;
+    GOOGLE_MAPS_CHANNEL = cfg.trackingId;
+  }
   if (!GOOGLE_MAPS_KEY) {
     return Promise.reject(new Error("Google Maps browser key is not configured"));
   }
@@ -48,6 +54,7 @@ function loadGooglePlaces(): Promise<any> {
   });
   return window.__googleMapsPlacesLoading;
 }
+
 
 type Parts = {
   address: string;
