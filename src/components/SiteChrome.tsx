@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { Facebook, Twitter, Instagram } from "lucide-react";
 import { CartButton } from "./CartButton";
+import { StyleSwitcher } from "./StyleSwitcher";
+
 
 export function SiteHeader({ member }: { member: any }) {
   return (
@@ -25,6 +27,8 @@ export function SiteHeader({ member }: { member: any }) {
           <li><Link to="/" hash="products" className="hover:text-primary">Products</Link></li>
           <li><Link to="/" hash="contact" className="hover:text-primary">Contact</Link></li>
           <li><CartButton /></li>
+          <li><StyleSwitcher /></li>
+
           {member?.facebookProfile && (
             <li>
               <a href={member.facebookProfile} target="_blank" rel="noreferrer" aria-label="Facebook">

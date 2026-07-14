@@ -8,6 +8,8 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { CartProvider } from "@/lib/cart";
+import { ThemeProvider, THEME_INIT_SCRIPT } from "@/lib/theme";
+import { LayoutProvider, LAYOUT_INIT_SCRIPT } from "@/lib/layout-theme";
 import { CartDrawer } from "@/components/CartDrawer";
 import { Toaster } from "@/components/ui/sonner";
 import { getDreamozData } from "@/lib/dreamoz.functions";
@@ -117,6 +119,8 @@ function RootShell({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: LAYOUT_INIT_SCRIPT }} />
         <HeadContent />
       </head>
       <body>
@@ -132,11 +136,15 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <CartProvider>
-        <Outlet />
-        <CartDrawerMount />
-        <Toaster richColors position="top-right" />
-      </CartProvider>
+      <ThemeProvider>
+        <LayoutProvider>
+          <CartProvider>
+            <Outlet />
+            <CartDrawerMount />
+            <Toaster richColors position="top-right" />
+          </CartProvider>
+        </LayoutProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
